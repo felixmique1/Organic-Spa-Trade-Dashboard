@@ -170,6 +170,34 @@ tbody tr:hover td{background:var(--s2)}
 .drilldown-overlay.open{display:block}
 .chart-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:8px;font-style:italic}
 
+
+/* REPORTES PAGE */
+.rep-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.rep-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:var(--surface);border-radius:var(--r);padding:18px 20px;border:1px solid var(--b);margin-bottom:16px}
+.rep-filter-group{display:flex;flex-direction:column;gap:5px}
+.rep-filter-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
+.rep-filter-group select{padding:7px 10px;border:1px solid var(--b);border-radius:var(--rs);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--t);background:var(--surface);cursor:pointer;min-width:140px}
+.rep-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+.rep-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:16px 18px;cursor:pointer;transition:all .15s;border-left:3px solid var(--b)}
+.rep-card:hover{border-color:var(--acc);box-shadow:0 2px 12px rgba(61,90,62,0.1)}
+.rep-card.selected{border-left-color:var(--acc);background:var(--gbg)}
+.rep-card-title{font-size:13px;font-weight:600;color:var(--t);margin-bottom:4px}
+.rep-card-desc{font-size:11px;color:var(--t3);line-height:1.5}
+.rep-card-icon{font-size:20px;margin-bottom:8px}
+.rep-preview{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);overflow:hidden}
+.rep-preview-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--b);background:var(--s2)}
+.rep-preview-title{font-size:13px;font-weight:600;color:var(--t)}
+.rep-count{font-size:11px;color:var(--t3)}
+.rep-table-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
+.rep-table{width:100%;border-collapse:collapse;font-size:12px}
+.rep-table thead th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding:9px 12px;border-bottom:2px solid var(--b);background:var(--surface);position:sticky;top:0;white-space:nowrap}
+.rep-table tbody td{padding:9px 12px;border-bottom:1px solid var(--b);color:var(--t2);vertical-align:top;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rep-table tbody tr:hover td{background:var(--s2)}
+.rep-table tbody tr:last-child td{border-bottom:none}
+.dl-btn{display:flex;align-items:center;gap:7px;background:var(--acc);color:#fff;border:none;border-radius:var(--rs);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.dl-btn:hover{background:var(--mid, #5C7A5E);transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,90,62,0.25)}
+.dl-btn svg{width:15px;height:15px}
+.rep-empty{text-align:center;padding:50px;color:var(--t3);font-size:13px}
 @media(max-width:768px){.sidebar{width:100%;position:relative}.main{margin-left:0;padding:16px}.cr{grid-template-columns:1fr}.foto-imgs{grid-template-columns:1fr 1fr}}
 /* CLICKABLE ALERTS */
 .alert{cursor:pointer;transition:filter .15s,transform .15s}
@@ -236,6 +264,7 @@ tbody tr:hover td{background:var(--s2)}
 .repo-suc-cadena{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
 .repo-suc-meta{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -256,6 +285,7 @@ tbody tr:hover td{background:var(--s2)}
     <button class="nav-item" onclick="switchView('competencia',this)">⚑ Competencia</button>
     <button class="nav-item" onclick="switchView('modulos',this)">◫ Módulos</button>
     <button class="nav-item" onclick="switchView('quiebres',this)">◻ Quiebres</button>
+    <button class="nav-item" onclick="switchView('reportes',this)">⬇ Reportes</button>
   </div>
   <div class="sidebar-footer">
     <div class="upd"><span class="dot" id="statusDot"></span><span id="lastUpdate">Conectando...</span></div>
@@ -417,6 +447,58 @@ tbody tr:hover td{background:var(--s2)}
     <div class="mod-chart-wrap" style="margin-top:16px">
       <div class="ct">Quiebres a lo largo del tiempo</div>
       <div style="position:relative;height:300px"><canvas id="cQuiebres" role="img" aria-label="quiebres por producto en el tiempo"></canvas></div>
+    </div>
+  </div>
+
+  <!-- REPORTES -->
+  <div id="view-reportes" class="view">
+    <div class="ph">
+      <div><div class="pt">Reportes</div><div class="ps">Filtra, previsualiza y descarga reportes en Excel con un clic</div></div>
+    </div>
+    <div class="rep-filters">
+      <div class="rep-filter-group">
+        <span class="rep-filter-label">Cadena</span>
+        <select id="repCadena" onchange="renderReporte()"><option value="all">Todas las cadenas</option></select>
+      </div>
+      <div class="rep-filter-group">
+        <span class="rep-filter-label">Mes</span>
+        <select id="repMes" onchange="renderReporte()"><option value="all">Todos los meses</option></select>
+      </div>
+      <div class="rep-filter-group">
+        <span class="rep-filter-label">Repositor</span>
+        <select id="repRepo" onchange="renderReporte()"><option value="all">Todos</option></select>
+      </div>
+      <div class="rep-filter-group">
+        <span class="rep-filter-label">Espacio</span>
+        <select id="repEspacio" onchange="renderReporte()">
+          <option value="all">Todos</option>
+          <option value="creci">Crecimos</option>
+          <option value="perdi">Perdimos</option>
+          <option value="igual">Igual</option>
+        </select>
+      </div>
+      <div class="rep-filter-group" style="margin-left:auto">
+        <span class="rep-filter-label">&nbsp;</span>
+        <button class="dl-btn" onclick="descargarReporte()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Descargar Excel
+        </button>
+      </div>
+    </div>
+    <div class="rep-cards" id="repCards"></div>
+    <div class="rep-preview">
+      <div class="rep-preview-header">
+        <div>
+          <div class="rep-preview-title" id="repPreviewTitle">Selecciona un tipo de reporte</div>
+          <div class="rep-count" id="repPreviewCount"></div>
+        </div>
+      </div>
+      <div class="rep-table-wrap">
+        <table class="rep-table">
+          <thead id="repThead"></thead>
+          <tbody id="repTbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1642,6 +1724,317 @@ function renderVisitas(){
   }).join('');
 }
 
+// ─── REPORTS DATA ──────────────────────────────────────────────────────────
+let currentReportType = 'visitas';
+
+const REPORT_TYPES = [
+  {
+    id: 'visitas',
+    icon: '☰',
+    title: 'Visitas completas',
+    desc: 'Todas las visitas con datos de reposicion, espacio, modulos y repositor.',
+    cols: ['Fecha','Mes','Cadena','Sucursal','Repositor','Espacio','Reposicion OK','Modulos','Marca nueva','Mercaderia deposito'],
+    fn: (D) => D.map(r => {
+      const p = (r['Supermercado y Sucursal']||'').split('|');
+      return {
+        Fecha: r['Fecha respuesta']||'',
+        Mes: r['Mes']||'',
+        Cadena: p[0]||'',
+        Sucursal: p[1]||p[0]||'',
+        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+        'Espacio': r['\u00bfCrecimos o perdimos espacio?']||'',
+        'Reposicion OK': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
+        Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
+        'Marca nueva': r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?']||'',
+        'Mercaderia deposito': r['\u00bfQued\u00f3 mercader\u00eda disponible en el dep\u00f3sito?']||''
+      };
+    })
+  },
+  {
+    id: 'reposicion',
+    icon: '◎',
+    title: 'Reposicion por producto',
+    desc: 'Estado de reposicion de cada SKU (difusor, inciensos, aromatizador, difusor home, vela votiva) por visita.',
+    cols: ['Fecha','Cadena','Sucursal','Repositor','Repuesto difusor','Inciensos','Arom. ambientes','Difusor Home','Vela Votiva','Reposicion OK','Comentarios'],
+    fn: (D) => D.map(r => {
+      const p = (r['Supermercado y Sucursal']||'').split('|');
+      const fid = String(r['FORM ID']||'');
+      const coms = (commentsMap[fid]||[]).filter(c=>c.comentario&&c.comentario.length>1).map(c=>`${c.producto}: ${c.comentario}`).join(' | ');
+      return {
+        Fecha: r['Fecha respuesta']||'',
+        Cadena: p[0]||'',
+        Sucursal: p[1]||p[0]||'',
+        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+        'Repuesto difusor': r['Repuesto difusor']||'',
+        'Inciensos': r['Inciensos']||'',
+        'Arom. ambientes': r['Aromatizador ambientes']||'',
+        'Difusor Home': r['Difusor Home']||'',
+        'Vela Votiva': r['Vela Votiva']||'',
+        'Reposicion OK': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
+        'Comentarios repositor': coms
+      };
+    })
+  },
+  {
+    id: 'quiebres',
+    icon: '◻',
+    title: 'Quiebres detallados',
+    desc: 'Solo las visitas donde hubo al menos un producto sin reponer, con comentario del repositor.',
+    cols: ['Fecha','Cadena','Sucursal','Repositor','Producto faltante','Comentario','Espacio','Modulos'],
+    fn: (D) => {
+      const rows = [];
+      D.forEach(r => {
+        if(!no(r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)'])) return;
+        const p = (r['Supermercado y Sucursal']||'').split('|');
+        const fid = String(r['FORM ID']||'');
+        const coms = commentsMap[fid]||[];
+        if(coms.length === 0) {
+          rows.push({
+            Fecha: r['Fecha respuesta']||'',
+            Cadena: p[0]||'',
+            Sucursal: p[1]||p[0]||'',
+            Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+            'Producto faltante': '—',
+            Comentario: '(sin comentario)',
+            Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
+            Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||''
+          });
+        } else {
+          coms.forEach(c => {
+            rows.push({
+              Fecha: r['Fecha respuesta']||'',
+              Cadena: p[0]||'',
+              Sucursal: p[1]||p[0]||'',
+              Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+              'Producto faltante': c.producto||'',
+              Comentario: c.comentario||'',
+              Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
+              Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||''
+            });
+          });
+        }
+      });
+      return rows;
+    }
+  },
+  {
+    id: 'espacio',
+    icon: '◈',
+    title: 'Evolucion de espacio',
+    desc: 'Resumen de ganadas y perdidas de espacio en gondola por cadena y sucursal.',
+    cols: ['Fecha','Cadena','Sucursal','Repositor','Espacio','Modulos','Tiras impulsivas','Decoracion especial'],
+    fn: (D) => D.map(r => {
+      const p = (r['Supermercado y Sucursal']||'').split('|');
+      return {
+        Fecha: r['Fecha respuesta']||'',
+        Cadena: p[0]||'',
+        Sucursal: p[1]||p[0]||'',
+        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+        Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
+        Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
+        'Tiras impulsivas': r['Tiras impulsivas']||'',
+        'Decoracion especial': r['Decoraci\u00f3n especial']||''
+      };
+    })
+  },
+  {
+    id: 'competencia',
+    icon: '⚑',
+    title: 'Competencia detectada',
+    desc: 'Solo visitas donde ingreso una marca nueva (Spirit, Aromanza o Sagrada Madre).',
+    cols: ['Fecha','Cadena','Sucursal','Repositor','Espacio','Modulos','Comentarios repositor'],
+    fn: (D) => D.filter(r=>yes(r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?'])).map(r => {
+      const p = (r['Supermercado y Sucursal']||'').split('|');
+      const fid = String(r['FORM ID']||'');
+      const coms = (commentsMap[fid]||[]).filter(c=>c.comentario&&c.comentario.length>1).map(c=>`${c.producto}: ${c.comentario}`).join(' | ');
+      return {
+        Fecha: r['Fecha respuesta']||'',
+        Cadena: p[0]||'',
+        Sucursal: p[1]||p[0]||'',
+        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+        Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
+        Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
+        'Comentarios repositor': coms
+      };
+    })
+  },
+  {
+    id: 'resumen',
+    icon: '◉',
+    title: 'Resumen ejecutivo por cadena',
+    desc: 'KPIs agregados por cadena: visitas, tasa de reposicion, modulos promedio, presencia de competencia.',
+    cols: ['Cadena','Total visitas','Repos. OK','% Repos OK','Crecimos','Perdimos','Mod. prom.','Con marca nueva','Sin mercaderia deposito'],
+    fn: (D) => {
+      const byChain = {};
+      D.forEach(r => {
+        const c = (r['Supermercado y Sucursal']||'').split('|')[0]||'?';
+        if(!byChain[c]) byChain[c]={v:0,ok:0,cr:0,pd:0,mods:[],mn:0,sinMerc:0};
+        byChain[c].v++;
+        if(yes(r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)'])) byChain[c].ok++;
+        if((r['\u00bfCrecimos o perdimos espacio?']||'').toLowerCase().includes('creci')) byChain[c].cr++;
+        if((r['\u00bfCrecimos o perdimos espacio?']||'').toLowerCase().includes('perdi')) byChain[c].pd++;
+        const m=parseFloat(r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'');
+        if(!isNaN(m)&&m>0) byChain[c].mods.push(m);
+        if(yes(r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?'])) byChain[c].mn++;
+        if(no(r['\u00bfQued\u00f3 mercader\u00eda disponible en el dep\u00f3sito?'])) byChain[c].sinMerc++;
+      });
+      return Object.entries(byChain).sort((a,b)=>b[1].v-a[1].v).map(([c,d])=>({
+        Cadena: c,
+        'Total visitas': d.v,
+        'Repos. OK': d.ok,
+        '% Repos OK': d.v>0?Math.round(d.ok/d.v*100)+'%':'—',
+        Crecimos: d.cr,
+        Perdimos: d.pd,
+        'Mod. prom.': d.mods.length>0?(d.mods.reduce((a,b)=>a+b,0)/d.mods.length).toFixed(1):'—',
+        'Con marca nueva': d.mn,
+        'Sin mercaderia deposito': d.sinMerc
+      }));
+    }
+  }
+];
+
+function getRepData() {
+  const cadena = document.getElementById('repCadena')?.value || 'all';
+  const mes = document.getElementById('repMes')?.value || 'all';
+  const repo = document.getElementById('repRepo')?.value || 'all';
+  const espacio = document.getElementById('repEspacio')?.value || 'all';
+
+  return allData.filter(r => {
+    const cOk = cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
+    const mOk = mes==='all'||(r['Mes']||'').toLowerCase()===mes;
+    const rOk = repo==='all'||`${r['Nombre']||''} ${r['Apellido']||''}`.trim()===repo;
+    const esp = (r['\u00bfCrecimos o perdimos espacio?']||'').toLowerCase();
+    const eOk = espacio==='all'||(espacio==='creci'&&esp.includes('creci'))||(espacio==='perdi'&&esp.includes('perdi'))||(espacio==='igual'&&!esp.includes('creci')&&!esp.includes('perdi')&&esp!=='');
+    return cOk&&mOk&&rOk&&eOk;
+  });
+}
+
+function renderReporte() {
+  // Populate filters
+  const cc = document.getElementById('repCadena');
+  const cex = [...cc.options].map(o=>o.value);
+  [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
+    .forEach(c=>{if(!cex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
+
+  const cm = document.getElementById('repMes');
+  const mex = [...cm.options].map(o=>o.value);
+  [...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))]
+    .sort((a,b)=>Object.keys(MESES_ES).indexOf(a)-Object.keys(MESES_ES).indexOf(b))
+    .forEach(m=>{if(!mex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;cm.appendChild(o);}});
+
+  const cr = document.getElementById('repRepo');
+  const rex = [...cr.options].map(o=>o.value);
+  [...new Set(allData.map(r=>`${r['Nombre']||''} ${r['Apellido']||''}`.trim()).filter(Boolean))].sort()
+    .forEach(n=>{if(!rex.includes(n)){const o=document.createElement('option');o.value=n;o.textContent=n;cr.appendChild(o);}});
+
+  // Render type cards
+  const cardsEl = document.getElementById('repCards');
+  if(cardsEl) {
+    cardsEl.innerHTML = REPORT_TYPES.map(rt=>`
+      <div class="rep-card${rt.id===currentReportType?' selected':''}" onclick="selectReport('${rt.id}')">
+        <div class="rep-card-icon">${rt.icon}</div>
+        <div class="rep-card-title">${rt.title}</div>
+        <div class="rep-card-desc">${rt.desc}</div>
+      </div>`).join('');
+  }
+
+  // Render table
+  const D = getRepData();
+  const rt = REPORT_TYPES.find(r=>r.id===currentReportType);
+  if(!rt) return;
+
+  const rows = rt.fn(D);
+  document.getElementById('repPreviewTitle').textContent = rt.title;
+  document.getElementById('repPreviewCount').textContent = `${rows.length} registro${rows.length!==1?'s':''} · Vista previa primeras 50 filas`;
+
+  const thead = document.getElementById('repThead');
+  const tbody = document.getElementById('repTbody');
+
+  if(rows.length===0) {
+    thead.innerHTML='';
+    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--t3)">Sin datos para los filtros seleccionados.</td></tr>`;
+    return;
+  }
+
+  const cols = rt.cols;
+  thead.innerHTML = `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  tbody.innerHTML = rows.slice(0,50).map(row=>`<tr>${cols.map(c=>{
+    const v = row[c]||'';
+    const isOk = ['Si','Sí','si','sí'].includes(v);
+    const isNo = ['No','no'].includes(v);
+    const isCreci = v.toLowerCase().includes('creci');
+    const isPerdi = v.toLowerCase().includes('perdi');
+    let style = '';
+    if(isOk||isCreci) style='color:var(--green);font-weight:500';
+    else if(isNo||isPerdi) style='color:var(--red);font-weight:500';
+    return `<td style="${style}" title="${v}">${v}</td>`;
+  }).join('')}</tr>`).join('');
+}
+
+function selectReport(id) {
+  currentReportType = id;
+  renderReporte();
+}
+
+function descargarReporte() {
+  if(typeof XLSX === 'undefined') { alert('Cargando libreria Excel, intenta en un momento...'); return; }
+  const D = getRepData();
+  const rt = REPORT_TYPES.find(r=>r.id===currentReportType);
+  if(!rt) return;
+
+  const rows = rt.fn(D);
+  if(rows.length===0) { alert('No hay datos para descargar con los filtros actuales.'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // Main sheet
+  const ws = XLSX.utils.json_to_sheet(rows, { header: rt.cols });
+  // Style header row width
+  const colWidths = rt.cols.map(c=>({ wch: Math.max(c.length+2, 14) }));
+  ws['!cols'] = colWidths;
+  XLSX.utils.book_append_sheet(wb, ws, rt.title.substring(0,31));
+
+  // Summary sheet (always include)
+  if(rt.id !== 'resumen') {
+    const resumenRt = REPORT_TYPES.find(r=>r.id==='resumen');
+    const resRows = resumenRt.fn(D);
+    if(resRows.length > 0) {
+      const wsRes = XLSX.utils.json_to_sheet(resRows, { header: resumenRt.cols });
+      wsRes['!cols'] = resumenRt.cols.map(c=>({ wch: Math.max(c.length+2, 12) }));
+      XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen por cadena');
+    }
+  }
+
+  // Metadata sheet
+  const filtros = {
+    Cadena: document.getElementById('repCadena')?.value||'all',
+    Mes: document.getElementById('repMes')?.value||'all',
+    Repositor: document.getElementById('repRepo')?.value||'all',
+    Espacio: document.getElementById('repEspacio')?.value||'all',
+  };
+  const meta = [
+    { Campo: 'Reporte', Valor: rt.title },
+    { Campo: 'Total registros', Valor: rows.length },
+    { Campo: 'Filtro Cadena', Valor: filtros.Cadena==='all'?'Todas':filtros.Cadena },
+    { Campo: 'Filtro Mes', Valor: filtros.Mes==='all'?'Todos':(MESES_ES[filtros.Mes]||filtros.Mes) },
+    { Campo: 'Filtro Repositor', Valor: filtros.Repositor==='all'?'Todos':filtros.Repositor },
+    { Campo: 'Filtro Espacio', Valor: filtros.Espacio==='all'?'Todos':filtros.Espacio },
+    { Campo: 'Generado', Valor: new Date().toLocaleString('es-AR') },
+    { Campo: 'Fuente', Valor: 'Organic Spa Trade Dashboard' },
+  ];
+  const wsMeta = XLSX.utils.json_to_sheet(meta, { header: ['Campo','Valor'] });
+  wsMeta['!cols'] = [{ wch: 22 }, { wch: 35 }];
+  XLSX.utils.book_append_sheet(wb, wsMeta, 'Metadata');
+
+  // Filename
+  const fecha = new Date().toISOString().slice(0,10);
+  const cadenaSlug = (filtros.Cadena==='all'?'todas':filtros.Cadena).replace(/\s/g,'_').toLowerCase();
+  const mesSlug = filtros.Mes==='all'?'todos_meses':filtros.Mes;
+  const filename = `OS_${rt.id}_${cadenaSlug}_${mesSlug}_${fecha}.xlsx`;
+
+  XLSX.writeFile(wb, filename);
+}
+
 function switchView(v,btn){
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
@@ -1653,6 +2046,7 @@ function switchView(v,btn){
   if(v==='modulos') renderModulos();
   if(v==='quiebres') renderQuiebres();
   if(v==='visitas') renderVisitas();
+  if(v==='reportes') renderReporte();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeDetail();closeAlertModal();}});
 
