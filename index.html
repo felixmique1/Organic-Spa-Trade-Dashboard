@@ -10,13 +10,14 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#F2EDE4;--surface:#FDFAF6;--s2:#EAE4D9;
-  --b:rgba(61,90,62,0.12);--bs:rgba(61,90,62,0.22);
+  --b:rgba(111,161,61,0.12);--bs:rgba(111,161,61,0.22);
   --t:#2C2C2A;--t2:#5C5A52;--t3:#9A9688;
-  --green:#3D5A3E;--gbg:#E8F0E8;
+  --green:#6FA13D;--gbg:#EDF5DF;
   --amber:#8B6914;--abg:#F5EDD8;
   --red:#8B3A2E;--rbg:#F5E8E6;
   --blue:#2B4A6B;--bbg:#E6EDF5;
-  --acc:#3D5A3E;--acc2:#7A9E7E;--gold:#C4A882;
+  --acc:#6FA13D;--acc2:#8DBF52;--gold:#C4A882;
+  --mid:#5C7A5E;
   --r:12px;--rs:8px;
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;font-size:14px}
@@ -31,7 +32,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-he
 .nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:0 8px;margin:12px 0 4px}
 .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;color:var(--t2);font-size:13px;border:none;background:none;width:100%;text-align:left;transition:all .15s}
 .nav-item:hover{background:var(--s2);color:var(--t)}
-.nav-item.active{background:var(--acc);color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(61,90,62,0.25)}
+.nav-item.active{background:var(--acc);color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(111,161,61,0.25)}
 .sidebar-footer{margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--b)}
 .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#7A9E7E;margin-right:5px;animation:pulse 2s infinite}
 .dot.red{background:#e53935}
@@ -198,6 +199,22 @@ tbody tr:hover td{background:var(--s2)}
 .dl-btn:hover{background:var(--mid, #5C7A5E);transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,90,62,0.25)}
 .dl-btn svg{width:15px;height:15px}
 .rep-empty{text-align:center;padding:50px;color:var(--t3);font-size:13px}
+.exhib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.exhib-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);overflow:hidden;transition:transform .15s;cursor:pointer}
+.exhib-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.exhib-card-header{padding:12px 14px;border-bottom:1px solid var(--b)}
+.exhib-card-title{font-size:13px;font-weight:600;color:var(--t)}
+.exhib-card-meta{font-size:11px;color:var(--t3);margin-top:2px;font-family:'DM Mono',monospace}
+.exhib-photo{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;transition:transform .2s}
+.exhib-photo:hover{transform:scale(1.02)}
+.exhib-noimg{width:100%;aspect-ratio:4/3;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:12px}
+.exhib-comment{padding:10px 14px;font-size:12px;color:var(--t2);line-height:1.5;border-top:1px solid var(--b);background:var(--straw,#F7F3EC)}
+.sidebar{transition:width .25s ease}
+.sidebar.collapsed{width:0;overflow:hidden;padding:0}
+.sidebar-toggle{position:fixed;top:12px;left:220px;z-index:200;width:28px;height:28px;border-radius:6px;border:1px solid var(--bs);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--t3);transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sidebar-toggle:hover{background:var(--s2);color:var(--acc)}
+.sidebar.collapsed+.sidebar-toggle,.sidebar-toggle.sidebar-open{left:4px}
+.main{transition:margin-left .25s ease}
 @media(max-width:768px){.sidebar{width:100%;position:relative}.main{margin-left:0;padding:16px}.cr{grid-template-columns:1fr}.foto-imgs{grid-template-columns:1fr 1fr}}
 /* CLICKABLE ALERTS */
 .alert{cursor:pointer;transition:filter .15s,transform .15s}
@@ -268,23 +285,32 @@ tbody tr:hover td{background:var(--s2)}
 </head>
 <body>
 <div class="layout">
-<aside class="sidebar">
+<button class="sidebar-toggle sidebar-open" id="sidebarToggle" onclick="toggleSidebar()" title="Mostrar / ocultar menú">☰</button>
+<aside class="sidebar" id="mainSidebar">
   <div class="brand">
-    <img src="https://organicspa.com.ar/cdn/shop/files/Logotipo.png?v=1756826642" alt="Organic Spa" style="width:140px;display:block;margin-bottom:10px;filter:brightness(0) saturate(100%) invert(27%) sepia(18%) saturate(800%) hue-rotate(80deg) brightness(85%)">
+    <img src="https://organicspa.com.ar/cdn/shop/files/Logotipo.png?v=1756826642" alt="Organic Spa" style="width:140px;display:block;margin-bottom:10px;filter:brightness(0) saturate(100%) invert(55%) sepia(70%) saturate(400%) hue-rotate(50deg) brightness(88%)">
     <div class="brand-sub" style="color:var(--acc2);font-size:11px;letter-spacing:.06em;font-weight:500;text-transform:uppercase">Trade Dashboard</div>
   </div>
   <div class="nav-section">
-    <div class="nav-label">Vistas</div>
     <button class="nav-item active" onclick="switchView('resumen',this)">◈ Resumen</button>
-    <button class="nav-item" onclick="switchView('cadenas',this)">◉ Por cadena</button>
+
+    <div class="nav-label">Análisis</div>
     <button class="nav-item" onclick="switchView('alertas',this)">◎ Alertas</button>
-    <button class="nav-item" onclick="switchView('repos',this)">◷ Repositores</button>
-    <button class="nav-item" onclick="switchView('insights',this)">✦ Insights IA</button>
-    <button class="nav-item" onclick="switchView('fotos',this)">⬡ Fotos de góndola</button>
-    <button class="nav-item" onclick="switchView('visitas',this)">☰ Visitas</button>
+
+    <div class="nav-label">Categoría</div>
     <button class="nav-item" onclick="switchView('competencia',this)">⚑ Competencia</button>
     <button class="nav-item" onclick="switchView('modulos',this)">◫ Módulos</button>
     <button class="nav-item" onclick="switchView('quiebres',this)">◻ Quiebres</button>
+
+    <div class="nav-label">Cadenas &amp; Equipo</div>
+    <button class="nav-item" onclick="switchView('cadenas',this)">◉ Por cadena</button>
+    <button class="nav-item" onclick="switchView('repos',this)">◷ Repositores</button>
+
+    <div class="nav-label">Registro</div>
+    <button class="nav-item" onclick="switchView('visitas',this)">☰ Visitas</button>
+    <button class="nav-item" onclick="switchView('fotos',this)">⬡ Fotos de góndola</button>
+    <button class="nav-item" onclick="switchView('exhibidores',this)">◫ Exhibidores</button>
+
     <button class="nav-item" onclick="switchView('reportes',this)">⬇ Reportes</button>
   </div>
   <div class="sidebar-footer">
@@ -337,7 +363,7 @@ tbody tr:hover td{background:var(--s2)}
   <div id="view-cadenas" class="view">
     <div class="ph"><div><div class="pt">Por cadena</div><div class="ps">Performance de reposición por cadena</div></div></div>
     <div class="card"><div class="ct">Performance por cadena</div>
-      <div class="tw"><table><thead><tr><th>Cadena</th><th>Visitas</th><th>Reposición OK</th><th>Crecimos</th><th>Perdimos</th><th>Marca nueva</th><th>Módulos</th></tr></thead><tbody id="tb1"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>Cadena</th><th>Visitas</th><th>Sin faltantes</th><th>Crecimos</th><th>Perdimos</th><th>Marca nueva</th><th>Módulos</th></tr></thead><tbody id="tb1"></tbody></table></div>
     </div>
   </div>
 
@@ -356,22 +382,7 @@ tbody tr:hover td{background:var(--s2)}
   </div>
 
   <!-- INSIGHTS IA -->
-  <div id="view-insights" class="view">
-    <div class="ph">
-      <div><div class="pt">Insights IA</div><div class="ps">Análisis automático generado por inteligencia artificial</div></div>
-      <button class="regenerate-btn" onclick="generateInsights(true)">↻ Regenerar análisis</button>
-    </div>
-    <div class="kpi-grid" id="kpiGrid"></div>
-    <div class="insight-ai">
-      <div class="insight-header">
-        <span class="insight-badge">ANÁLISIS IA</span>
-        <span class="insight-date" id="insightDate">—</span>
-      </div>
-      <div id="insightText"><div class="insight-loading"><div class="insight-sp"></div>Generando análisis con IA...</div></div>
-    </div>
-  </div>
-
-  <!-- FOTOS -->
+  <  <!-- FOTOS -->
   <div id="view-fotos" class="view">
     <div class="ph"><div><div class="pt">Fotos de góndola</div><div class="ps">Registro visual de reposiciones</div></div></div>
     <div class="foto-filters">
@@ -402,10 +413,10 @@ tbody tr:hover td{background:var(--s2)}
             <th>Sucursal</th>
             <th>Repositor</th>
             <th>Espacio</th>
-            <th>Reposición</th>
+            <th>Sin faltantes</th>
             <th>Módulos</th>
             <th>Marca nueva</th>
-            <th>Comentarios repositor</th>
+            <th>Comentario del repositor</th>
           </tr>
         </thead>
         <tbody id="visitasBody"></tbody>
@@ -538,6 +549,19 @@ tbody tr:hover td{background:var(--s2)}
     </div>
   </div>
 
+  <!-- EXHIBIDORES -->
+  <div id="view-exhibidores" class="view">
+    <div class="ph">
+      <div><div class="pt">Exhibidores</div><div class="ps">Fotos de exhibidores reportadas por los repositores</div></div>
+      <div class="filters">
+        <select id="exhibCadena" onchange="renderExhibidores()"><option value="all">Todas las cadenas</option></select>
+        <select id="exhibMes" onchange="renderExhibidores()"><option value="all">Todos los meses</option></select>
+      </div>
+    </div>
+    <div class="comp-count" id="exhibCount"></div>
+    <div class="exhib-grid" id="exhibGrid"></div>
+  </div>
+
 </main>
 </div>
 
@@ -588,7 +612,7 @@ tbody tr:hover td{background:var(--s2)}
 <script>
 const SID = '1U6YMhvEEgM6O1DwLDO4Kvh0NLFeEuPl1T0T6r5-gOco';
 const SNAME = 'Consolidado';
-let allData = [], CH = {}, insightsGenerated = false;
+let allData = [], CH = {}, commentsMap = {};
 
 function setStatus(ok,msg){document.getElementById('statusDot').className='dot'+(ok?'':' red');document.getElementById('lastUpdate').textContent=msg;}
 function showErr(msg){const e=document.getElementById('err');e.style.display='block';e.innerHTML=msg;}
@@ -741,7 +765,6 @@ async function loadData(){
     populateFilters();
     setStatus(true,'Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}));
     render();
-    if(!insightsGenerated) generateInsights(false);
   }catch(e){
     showErr(`<strong>Error al cargar datos.</strong> <a href="javascript:location.reload()">Reintentar</a> — ${e.message}`);
     setStatus(false,'Sin datos');
@@ -811,7 +834,7 @@ function render(){
 
   document.getElementById('mg').innerHTML=[
     {l:'Total visitas',v:N,s:'formularios',cls:''},
-    {l:'Reposición OK',v:pct+'%',s:`${ok} de ${N}`,cls:pct>=70?'g':pct>=50?'a':'r'},
+    {l:'Sin faltantes',v:pct+'%',s:`${ok} de ${N} visitas`,cls:pct>=70?'g':pct>=50?'a':'r'},
     {l:'Crecimos espacio',v:cr,s:Math.round(cr/N*100)+'% de visitas',cls:'g'},
     {l:'Perdimos espacio',v:pd,s:Math.round(pd/N*100)+'% de visitas',cls:pd>0?'r':'g'},
     {l:'Marcas nuevas',v:mn,s:'ingresos competencia',cls:mn>3?'r':mn>0?'a':'g'},
@@ -835,7 +858,6 @@ function render(){
   renderCadenas(D);
   renderAlertas(D,N);
   renderRepos(D);
-  renderKPIs(D,N,ok,cr,pd,mn,pm);
 }
 
 function renderCharts(D,N,cr,pd){
@@ -960,46 +982,58 @@ let alertsData = [];
 function renderAlertas(D,N){
   alertsData=[];
 
-  // Pérdida de espacio
+  // ── DATA CALCULATIONS ─────────────────────────────────────────────────────
   const pd=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi'));
-  if(pd.length){
-    const rows=pd.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—',
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'r',i:'⚑',
-      ti:`Perdimos espacio en ${pd.length} visita(s)`,
-      d:`${pd.length} sucursal${pd.length!==1?'es':''} con reducción de espacio detectada. Requiere acción comercial urgente.`,
-      detail:`Espacios perdidos detectados en ${[...new Set(rows.map(r=>r.cadena))].join(', ')}. Cada caso representa una oportunidad para el competidor.`,
-      rows,tipo:'perdida'});
-  }
-
-  // Competencia
-  const mn=D.filter(r=>yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']));
-  if(mn.length){
-    const rows=mn.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      espacio:r['¿Crecimos o perdimos espacio?']||'—',
-      mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—',
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'a',i:'!',
-      ti:`Nuevas marcas competidoras en ${mn.length} caso(s)`,
-      d:`Spirit, Aromanza o Sagrada Madre detectadas en ${[...new Set(rows.map(r=>r.suc))].slice(0,4).join(', ')}.`,
-      detail:'Presencia de competidores en el lineal. Registrar qué marca ingresó y qué espacio ocupa para negociar su remoción.',
-      rows,tipo:'competencia'});
-  }
-
-  // Reposición incompleta
+  const sm=D.filter(r=>no(r['¿Quedó mercadería disponible en el depósito?']));
   const sr=D.filter(r=>no(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']));
-  if(sr.length){
+  const mn=D.filter(r=>yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']));
+  const cr=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'));
+  const ok=D.filter(r=>yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']));
+  const pct=N>0?Math.round(ok.length/N*100):0;
+
+  // Helper to build row objects
+  function mkRows(arr,extra){
+    return arr.map(r=>{
+      const parts=(r['Supermercado y Sucursal']||'').split('|');
+      return Object.assign({
+        suc:parts[1]||parts[0]||'',
+        cadena:parts[0]||'',
+        fecha:r['Fecha respuesta']||'',
+        repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
+        mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—',
+        comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
+      }, extra||{});
+    });
+  }
+
+  // ── 6 FIXED ALERTS ────────────────────────────────────────────────────────
+
+  // 🔴 1 — Pérdida de espacio
+  alertsData.push({t:'r', i:'⚑',
+    ti: pd.length>0 ? `Perdimos espacio en ${pd.length} visita${pd.length!==1?'s':''}` : 'Sin pérdidas de espacio',
+    d:  pd.length>0
+      ? `${[...new Set(pd.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]))].join(', ')} · Requiere acción comercial.`
+      : `Todo el período sin pérdida de espacio en góndola.`,
+    detail: pd.length>0
+      ? `Pérdidas detectadas en ${[...new Set(mkRows(pd).map(r=>r.cadena))].join(', ')}. Cada caso es una oportunidad para el competidor.`
+      : 'No se registraron pérdidas de espacio en el período seleccionado.',
+    rows: mkRows(pd), tipo:'perdida'
+  });
+
+  // 🔴 2 — Sin mercadería en depósito
+  alertsData.push({t:'r', i:'⚑',
+    ti: sm.length>0 ? `Sin mercadería en depósito: ${sm.length} caso${sm.length!==1?'s':''}` : 'Depósitos con stock disponible',
+    d:  sm.length>0
+      ? `Riesgo de quiebre inminente en ${[...new Set(mkRows(sm).map(r=>r.cadena))].join(', ')}.`
+      : `Todos los depósitos visitados tenían mercadería disponible.`,
+    detail: sm.length>0
+      ? 'El repositor fue a reponer pero no encontró mercadería en el depósito. Resolver antes de la próxima visita.'
+      : 'Sin casos de depósito vacío en el período.',
+    rows: mkRows(sm), tipo:'stock'
+  });
+
+  // 🟡 3 — Llenado incompleto
+  (function(){
     const productCount={};
     sr.forEach(r=>{
       (commentsMap[String(r['FORM ID']||'')]||[]).forEach(c=>{
@@ -1007,118 +1041,66 @@ function renderAlertas(D,N){
       });
     });
     const topProds=Object.entries(productCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    const rows=sr.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'a',i:'!',
-      ti:`${sr.length} visitas con reposición incompleta (${Math.round(sr.length/N*100)}%)`,
-      d:topProds.length>0?`Productos más afectados: ${topProds.map(([p,n])=>`${p} (${n}x)`).join(', ')}`:`${Math.round(sr.length/N*100)}% del total de visitas sin reposición completa`,
-      detail:'Faltantes detectados por los repositores. Los comentarios debajo muestran las variantes específicas que no estaban disponibles.',
-      rows,topProds,tipo:'reposicion'});
-  }
-
-  // Sin mercadería en depósito
-  const sm=D.filter(r=>no(r['¿Quedó mercadería disponible en el depósito?']));
-  if(sm.length){
-    const rows=sm.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'r',i:'⚑',
-      ti:`Sin mercadería en depósito: ${sm.length} caso(s)`,
-      d:`Depósitos vacíos en ${[...new Set(rows.map(r=>r.cadena))].join(', ')}. Riesgo inminente de quiebre de stock.`,
-      detail:'El repositor fue a reponer pero no encontró mercadería en el depósito de la tienda. Esto indica un problema de abastecimiento o logística que debe resolverse antes de la próxima visita.',
-      rows,tipo:'stock'});
-  }
-
-  // Variantes faltantes desde comentarios
-  const variantCount={};
-  D.forEach(r=>{
-    (commentsMap[String(r['FORM ID']||'')]||[]).forEach(c=>{
-      if(c.comentario&&c.comentario.length>2&&!['si','no','sí'].includes(c.comentario.toLowerCase().trim())){
-        const k=`${c.producto}|${c.comentario.trim().toLowerCase()}`;
-        if(!variantCount[k]) variantCount[k]={producto:c.producto,comentario:c.comentario,n:0,sucursales:[]};
-        variantCount[k].n++;
-        const suc=(D.find(r2=>{ const fid=String(r2['FORM ID']||''); return (commentsMap[fid]||[]).some(cc=>cc.comentario===c.comentario); })||{})['Supermercado y Sucursal']||'';
-        if(suc&&!variantCount[k].sucursales.includes(suc)) variantCount[k].sucursales.push(suc);
-      }
+    alertsData.push({t:'a', i:'!',
+      ti: sr.length>0
+        ? `Llenado incompleto en ${sr.length} visita${sr.length!==1?'s':''} (${Math.round(sr.length/N*100)}%)`
+        : 'Cobertura completa en todas las visitas',
+      d: sr.length>0
+        ? (topProds.length>0 ? `Más afectados: ${topProds.map(([p,n])=>`${p} (${n}x)`).join(', ')}` : `${Math.round(sr.length/N*100)}% de visitas con faltantes`)
+        : 'El 100% de las visitas lograron reponer todos los productos.',
+      detail: sr.length>0
+        ? 'Faltantes detectados por repositores. Los comentarios muestran variantes específicas no disponibles.'
+        : 'Sin registros de faltantes en el período seleccionado.',
+      rows: mkRows(sr), topProds, tipo:'reposicion'
     });
+  })();
+
+  // 🟡 4 — Competencia
+  alertsData.push({t:'a', i:'!',
+    ti: mn.length>0 ? `Competencia detectada en ${mn.length} caso${mn.length!==1?'s':''}` : 'Sin nuevas marcas competidoras',
+    d:  mn.length>0
+      ? `Spirit, Aromanza o Sagrada Madre en ${[...new Set(mkRows(mn).map(r=>r.suc))].slice(0,4).join(', ')}.`
+      : 'No se registraron ingresos de nuevas marcas en el período.',
+    detail: mn.length>0
+      ? 'Presencia de competidores en el lineal. Registrar qué marca ingresó y qué espacio ocupa para negociar su remoción.'
+      : 'Sin ingresos de competencia detectados en el período seleccionado.',
+    rows: mkRows(mn, {espacio:undefined}), tipo:'competencia'
   });
-  const topVariants=Object.values(variantCount).sort((a,b)=>b.n-a.n).slice(0,8);
-  if(topVariants.length>0){
-    alertsData.push({t:'a',i:'◎',
-      ti:`${topVariants.length} variantes reportadas como faltantes por repositores`,
-      d:topVariants.slice(0,3).map(v=>`${v.producto}: "${v.comentario}" (${v.n}x)`).join(' · '),
-      detail:'Comentarios textuales de los repositores indicando exactamente qué variante o fragancia no estaba disponible. Esta información es clave para el próximo pedido.',
-      variants:topVariants,tipo:'variantes'});
-  }
 
-  // Stock critico desde comentarios
-  const stockFiltAlerta = (window.stockCritico||[]).filter(sc => {
-    // Match against current filter data
-    return D.some(r => {
-      const p = (r['Supermercado y Sucursal']||'').split('|');
-      return p[0]===sc.cadena && (p[1]||p[0])===sc.sucursal;
-    });
+  // 🟢 5 — Ganamos espacio
+  alertsData.push({t:'g', i:'✓',
+    ti: cr.length>0 ? `Ganamos espacio en ${cr.length} visita${cr.length!==1?'s':''}` : 'Sin crecimiento de espacio este período',
+    d:  cr.length>0
+      ? `Expansión en: ${[...new Set(mkRows(cr).map(r=>r.suc))].slice(0,5).join(', ')}.`
+      : 'No hubo cambios positivos de espacio en este período.',
+    detail: cr.length>0
+      ? 'Excelente resultado de negociación. Documentar acciones para replicarlas en otras sucursales.'
+      : 'Sin crecimiento de espacio registrado. Oportunidad de negociación para el próximo período.',
+    rows: mkRows(cr), tipo:'crecimiento'
   });
-  const stockCero = stockFiltAlerta.filter(s=>s.unidades===0);
-  const stockBajo = stockFiltAlerta.filter(s=>s.unidades>0&&s.unidades<=2);
 
-  if(stockCero.length > 0){
-    const rows = stockCero.map(s=>({
-      suc: s.sucursal, cadena: s.cadena, fecha: s.fecha,
-      repo: '', mods: '', comments:[{producto:s.producto,comentario:`Sin stock: ${s.fragancia}`}]
-    }));
-    A.push({t:'r',i:'⚑',
-      ti:`Sin stock reportado: ${stockCero.length} caso${stockCero.length!==1?'s':''}`,
-      d:stockCero.slice(0,3).map(s=>`${s.fragancia} en ${s.cadena}-${s.sucursal}`).join(' · '),
-      detail:'El repositor informo que no habia ninguna unidad disponible en deposito o gondola. Requiere reposicion urgente.',
-      rows, tipo:'stockcero'});
-  }
-  if(stockBajo.length > 0){
-    const rows = stockBajo.map(s=>({
-      suc: s.sucursal, cadena: s.cadena, fecha: s.fecha,
-      repo:'', mods:'', comments:[{producto:s.producto,comentario:`${s.unidades} unidad${s.unidades!==1?'es':''}: ${s.fragancia}`}]
-    }));
-    A.push({t:'a',i:'!',
-      ti:`Stock bajo (1-2 unidades): ${stockBajo.length} caso${stockBajo.length!==1?'s':''}`,
-      d:stockBajo.slice(0,3).map(s=>`${s.fragancia} - ${s.sucursal} (${s.unidades}u)`).join(' · '),
-      detail:'Repositores que encontraron solo 1 o 2 unidades disponibles en deposito. Riesgo de quiebre en la proxima visita si no se reabastece.',
-      rows, tipo:'stockbajo'});
-  }
+  // 🟢 6 — Cobertura completa
+  alertsData.push({t:'g', i:'✓',
+    ti: `${pct}% de visitas sin faltantes`,
+    d:  pct>=80
+      ? `${ok.length} de ${N} visitas con góndola completa. Resultado excelente.`
+      : pct>=60
+      ? `${ok.length} de ${N} visitas con góndola completa. Hay margen de mejora.`
+      : `${ok.length} de ${N} visitas completaron el llenado. Requiere atención.`,
+    detail: `Visitas donde el repositor pudo reponer todos los productos disponibles. Meta sugerida: ≥80%.`,
+    rows: mkRows(ok), tipo:'cobertura'
+  });
 
-  // Crecimos
-  const cr=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'));
-  if(cr.length){
-    const rows=cr.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—'
-    }));
-    alertsData.push({t:'g',i:'✓',
-      ti:`Crecimos espacio en ${cr.length} visita(s)`,
-      d:`Expansión de espacio en: ${[...new Set(rows.map(r=>r.suc))].slice(0,5).join(', ')}.`,
-      detail:'Excelentes resultados de negociación en góndola. Documentar qué acciones llevaron a este crecimiento para replicarlas en otras sucursales.',
-      rows,tipo:'crecimiento'});
-  }
-
-  document.getElementById('ac').innerHTML=alertsData.length
-    ?alertsData.map((a,i)=>`
-      <div class="alert ${a.t}" onclick="openAlertModal(${i})">
-        <div class="ai">${a.i}</div>
-        <div style="flex:1"><div class="at">${a.ti}</div><div class="ad">${a.d}</div></div>
-        <div class="alert-arrow">›</div>
-      </div>`).join('')
-    :'<div class="alert g"><div class="ai">✓</div><div><div class="at">Sin alertas activas</div><div class="ad">Todo en orden.</div></div></div>';
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  document.getElementById('ac').innerHTML = alertsData.map((a,i)=>`
+    <div class="alert ${a.t}" onclick="openAlertModal(${i})" style="cursor:pointer">
+      <div class="ai">${a.i}</div>
+      <div style="flex:1">
+        <div class="at">${a.ti}</div>
+        <div class="ad">${a.d}</div>
+      </div>
+      <div class="alert-arrow">›</div>
+    </div>`).join('');
 }
 
 function openAlertModal(idx){
@@ -1236,157 +1218,6 @@ function toggleRepo(detailId, chevronId){
     detail.classList.add('open');
     chev.classList.add('open');
   }
-}
-
-function renderKPIs(D,N,ok,cr,pd,mn,pm){
-  const repoPct=Math.round(ok/N*100);
-  const crPct=Math.round(cr/N*100);
-  const pdPct=Math.round(pd/N*100);
-  const kpis=[
-    {l:'Tasa de reposición completa',v:repoPct+'%',trend:'Formularios con reposición OK',sem:repoPct>=70?'g':repoPct>=50?'a':'r',bar:repoPct},
-    {l:'Crecimiento de espacio',v:crPct+'%',trend:`${cr} visitas con espacio ganado`,sem:crPct>10?'g':crPct>0?'a':'r',bar:crPct},
-    {l:'Pérdida de espacio',v:pdPct+'%',trend:`${pd} visitas con espacio perdido`,sem:pdPct===0?'g':pdPct<10?'a':'r',bar:pdPct},
-    {l:'Exposición a competencia',v:mn,trend:`${mn} ingresos de marcas nuevas`,sem:mn===0?'g':mn<=3?'a':'r',bar:Math.min(mn*10,100)},
-    {l:'Módulos promedio',v:pm.toFixed(1),trend:'Punteras / exhibidores por visita',sem:pm>=3?'g':pm>=2?'a':'r',bar:Math.min(pm/5*100,100)},
-    {l:'Total visitas registradas',v:N,trend:'Formularios en el período',sem:'g',bar:100},
-  ];
-  const colors={g:'#3D5A3E',a:'#8B6914',r:'#8B3A2E'};
-  document.getElementById('kpiGrid').innerHTML=kpis.map(k=>`
-    <div class="kpi-card">
-      <div class="kpi-top"><div class="kpi-label">${k.l}</div><div class="kpi-semaforo ${k.sem}"></div></div>
-      <div class="kpi-value">${k.v}</div>
-      <div class="kpi-trend">${k.trend}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${k.bar}%;background:${colors[k.sem]}"></div></div>
-    </div>`).join('');
-}
-
-function generateInsights(force=false){
-  if(insightsGenerated && !force) return;
-  if(allData.length===0) return;
-
-  const D=allData;
-  const N=D.length;
-  const ok=D.filter(r=>yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])).length;
-  const cr=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci')).length;
-  const pd=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi')).length;
-  const mn=D.filter(r=>yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?'])).length;
-  // Build fragancia ranking for KPI card
-  const fragForKpi = {};
-  D.forEach(r => {
-    const fid = String(r['FORM ID']||'').split('.')[0].trim();
-    (commentsMap[fid]||[]).forEach(c => {
-      parseFragancias(c.comentario).forEach(f => {
-        fragForKpi[f] = (fragForKpi[f]||0) + 1;
-      });
-    });
-  });
-  const topFragKpi = Object.entries(fragForKpi).sort((a,b)=>b[1]-a[1]).slice(0,1);
-  window._topFragKpi = topFragKpi;
-
-  const mds=D.map(r=>parseFloat(r['¿Cuántos módulos / punteras / exhibidor tenemos?']||r['¿Cuantos módulos / punteras / exhibidor tenemos?']||'')).filter(v=>!isNaN(v)&&v>0);
-  const pm=mds.length?(mds.reduce((a,b)=>a+b,0)/mds.length):0;
-  const repoPct=Math.round(ok/N*100);
-  const crPct=Math.round(cr/N*100);
-  const pdPct=Math.round(pd/N*100);
-
-  // Análisis por cadena
-  const C={};
-  D.forEach(r=>{
-    const c=(r['Supermercado y Sucursal']||'').split('|')[0]||'?';
-    const s=(r['Supermercado y Sucursal']||'').split('|')[1]||'';
-    if(!C[c])C[c]={v:0,ok:0,cr:0,pd:0,sucs:new Set()};
-    C[c].v++;C[c].sucs.add(s);
-    if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']))C[c].ok++;
-    if((r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'))C[c].cr++;
-    if((r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi'))C[c].pd++;
-  });
-  const cadenasSorted=Object.entries(C).sort((a,b)=>b[1].v-a[1].v);
-  const topCadena=cadenasSorted[0];
-  const cadenasConPerdida=cadenasSorted.filter(([,d])=>d.pd>0);
-  const peorRepo=cadenasSorted.filter(([,d])=>d.v>=3).sort((a,b)=>(a[1].ok/a[1].v)-(b[1].ok/b[1].v));
-  const mejorRepo=cadenasSorted.filter(([,d])=>d.v>=3).sort((a,b)=>(b[1].ok/b[1].v)-(a[1].ok/a[1].v));
-
-  // Aggregate comments for insights
-  const allComments=[];
-  D.forEach(r=>{const fid=String(r['FORM ID']||'');(commentsMap[fid]||[]).forEach(c=>{if(c.comentario&&c.comentario.length>1)allComments.push({...c,sucursal:r['Supermercado y Sucursal']||''});});});
-  const varFreq={};
-  allComments.forEach(c=>{const k=c.comentario.toLowerCase().trim();varFreq[k]=(varFreq[k]||0)+1;});
-  const topVariants=Object.entries(varFreq).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([v,n])=>`"${v}" (${n}x)`).join(', ');
-  const prodFreq={};
-  allComments.forEach(c=>{if(c.producto)prodFreq[c.producto]=(prodFreq[c.producto]||0)+1;});
-  const topProd=Object.entries(prodFreq).sort((a,b)=>b[1]-a[1])[0];
-
-  // Análisis por repositor
-  const R={};
-  D.forEach(r=>{
-    const n=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-    if(!n)return;
-    if(!R[n])R[n]={v:0,ok:0};
-    R[n].v++;
-    if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']))R[n].ok++;
-  });
-  const reposSorted=Object.entries(R).filter(([,d])=>d.v>=3).sort((a,b)=>(b[1].ok/b[1].v)-(a[1].ok/a[1].v));
-
-  // Análisis de mercadería
-  const sinDeposito=D.filter(r=>no(r['¿Quedó mercadería disponible en el depósito?'])).length;
-  const sinIngreso=D.filter(r=>no(r['¿Ingresó mercaderia?'])).length;
-
-  // Meses disponibles
-  const meses=[...new Set(D.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))];
-
-  // Construir el análisis
-  let situacion='';
-  if(repoPct>=75) situacion=`La operación muestra una tasa de reposición sólida del ${repoPct}% sobre ${N} visitas registradas en ${meses.join(' y ')}.`;
-  else if(repoPct>=55) situacion=`La operación presenta una tasa de reposición moderada del ${repoPct}% sobre ${N} visitas en ${meses.join(' y ')}, con margen claro de mejora.`;
-  else situacion=`La operación muestra una tasa de reposición baja del ${repoPct}% sobre ${N} visitas en ${meses.join(' y ')}, lo que requiere atención inmediata.`;
-
-  if(crPct>0&&pdPct===0) situacion+=` El espacio en góndola evolucionó positivamente: crecimos en ${cr} visitas (${crPct}%) sin registrar pérdidas.`;
-  else if(crPct>0&&pdPct>0) situacion+=` El espacio en góndola muestra señales mixtas: ganamos en ${cr} visitas pero perdimos en ${pd} (${pdPct}%).`;
-  else if(pdPct>0) situacion+=` Preocupa la pérdida de espacio registrada en ${pd} visitas (${pdPct}%).`;
-
-  if(topCadena) situacion+=` La cadena con mayor cobertura es ${topCadena[0]} con ${topCadena[1].v} visitas.`;
-  if(topProd) situacion+=` El producto con más reportes de faltante es ${topProd[0]} con ${topProd[1]} menciones en comentarios de repositores.`;
-
-  // Puntos críticos
-  const criticos=[];
-  if(peorRepo.length>0){const [nc,dc]=peorRepo[0];criticos.push(`${nc} es la cadena con peor tasa de reposición completa: ${Math.round(dc.ok/dc.v*100)}% en ${dc.v} visitas. Requiere revisión del proceso de abastecimiento en esa cadena.`);}
-  if(cadenasConPerdida.length>0){const nombres=cadenasConPerdida.map(([n,d])=>`${n} (${d.pd} vez${d.pd>1?'es':''})`).join(', ');criticos.push(`Se registraron pérdidas de espacio en ${cadenasConPerdida.length} cadena${cadenasConPerdida.length>1?'s':''}: ${nombres}. Estas bocas son prioritarias para negociación de espacio.`);}
-  if(sinDeposito>N*0.3) criticos.push(`En el ${Math.round(sinDeposito/N*100)}% de las visitas no había mercadería disponible en el depósito de la tienda. Esto indica un problema de abastecimiento o logística que impacta directamente la reposición.`);
-  if(mn>0) criticos.push(`Se detectaron ${mn} ingreso${mn>1?'s':''} de marcas competidoras en el lineal. Aunque es un número manejable, representa una amenaza concreta al espacio de góndola.`);
-  if(topVariants) criticos.push(`Las variantes más mencionadas como faltantes por los repositores son: ${topVariants}. Esto indica demanda insatisfecha específica que debería priorizarse en el próximo abastecimiento.`);
-  if(criticos.length===0) criticos.push('No se detectaron puntos críticos mayores en el período analizado. La operación se mantiene dentro de parámetros normales.');
-
-  // Oportunidades
-  const opps=[];
-  if(mejorRepo.length>0){const [nm,dm]=mejorRepo[0];opps.push(`${nm} tiene la mejor tasa de reposición (${Math.round(dm.ok/dm.v*100)}%). Analizar sus prácticas y replicarlas en otras cadenas puede mejorar el promedio general.`);}
-  if(pm<2.5) opps.push(`El promedio de módulos/punteras es de ${pm.toFixed(1)} por visita. Hay oportunidad de negociar más espacios de exhibición en las cadenas donde actualmente tenemos menos presencia.`);
-  else opps.push(`Con ${pm.toFixed(1)} módulos promedio por visita, la cobertura es razonable. El foco debería estar en mejorar la calidad de exhibición en los espacios actuales antes de buscar nuevos.`);
-  if(crPct>5) opps.push(`El ${crPct}% de visitas con crecimiento de espacio indica que la estrategia de expansión está funcionando. Identificar qué acciones generaron ese crecimiento para replicarlas.`);
-
-  // Recomendación
-  let reco='';
-  if(cadenasConPerdida.length>0) reco=`Esta semana: visitá personalmente ${cadenasConPerdida[0][0]} y reunite con el encargado de sección para recuperar el espacio perdido. Llevá argumentos de rotación y propuesta de activación en POP.`;
-  else if(peorRepo.length>0&&Math.round(peorRepo[0][1].ok/peorRepo[0][1].v*100)<60) reco=`Esta semana: auditá en detalle las causas de baja reposición en ${peorRepo[0][0]}. Verificar si es problema de stock, de logística o de ejecución del repositor.`;
-  else if(mn>2) reco=`Esta semana: mapeá exactamente en qué sucursales ingresaron marcas nuevas y qué espacio ocupan. Con esa info, armá una propuesta para el equipo comercial antes de que ganen posición.`;
-  else reco=`Esta semana: consolidá un reporte de los ${cr} casos donde crecimos espacio y presentalo internamente como caso de éxito. Usá esos aprendizajes para proponer una iniciativa similar en otras cadenas.`;
-
-  // Armar HTML del análisis
-  const sections=[
-    {title:'1. SITUACIÓN GENERAL',content:situacion,color:'var(--blue)'},
-    {title:'2. PUNTOS CRÍTICOS',content:criticos.map((c,i)=>'• '+c).join('\n\n'),color:'var(--red)'},
-    {title:'3. OPORTUNIDADES DETECTADAS',content:opps.map(o=>'• '+o).join('\n\n'),color:'var(--green)'},
-    {title:'4. RECOMENDACIÓN PRIORITARIA',content:reco,color:'var(--amber)'},
-  ];
-
-  const html=sections.map(s=>`
-    <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--b)">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:${s.color};margin-bottom:8px;text-transform:uppercase">${s.title}</div>
-      <div class="insight-text" style="font-size:14px;line-height:1.8;color:var(--t2);white-space:pre-wrap">${s.content}</div>
-    </div>`).join('');
-
-  document.getElementById('insightText').innerHTML=html;
-  document.getElementById('insightDate').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  insightsGenerated=true;
 }
 
 function renderFotos(){
@@ -1549,6 +1380,26 @@ function openDetail(formId){
     ]},
   ];
 
+  // Exhibidor photo + comment
+  const exhibFoto = r['Foto del exhibidor']||'';
+  const exhibComentario = (r['Comentario']||'').trim();
+  let exhibHtml = '';
+  if(exhibFoto && exhibFoto.startsWith('http')){
+    exhibHtml = `<div class="detail-section-title">Foto del Exhibidor</div>
+      <div class="detail-grid">
+        <div class="detail-photo" onclick="event.stopPropagation();openLightbox('${exhibFoto.replace(/'/g,"\'")}','Exhibidor — ${suc}')">
+          <img src="${exhibFoto}" alt="Exhibidor" loading="lazy" onerror="this.parentElement.style.display='none'">
+          <div class="detail-photo-label">Exhibidor</div>
+        </div>
+      </div>`;
+  }
+  if(exhibComentario){
+    exhibHtml += `<div style="background:var(--s2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--t2);margin-bottom:16px">
+      <span style="font-size:11px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Comentario del repositor</span>
+      ${exhibComentario}
+    </div>`;
+  }
+
   // Data summary
   const dataRows=[
     {k:'¿Quedó mercadería en depósito?',v:r['¿Quedó mercadería disponible en el depósito?']},
@@ -1581,7 +1432,7 @@ function openDetail(formId){
       </div>`
     :'';
 
-  let html=commentsSection+'<div class="detail-data">'
+  let html=exhibHtml+commentsSection+'<div class="detail-data">'
     +dataRows.map(d=>`<div class="detail-row"><span class="detail-key">${d.k}</span><span class="detail-val" style="${valColor(d.v)}">${d.v}</span></div>`).join('')
     +'</div>';
 
@@ -1964,7 +1815,12 @@ function renderVisitas(){
       <td><span class="visit-badge ${repoColor(reposicion)}">${yes(reposicion)?'Completa':no(reposicion)?'Incompleta':'—'}</span></td>
       <td style="font-size:13px;font-family:'DM Mono',monospace;color:var(--t2)">${mods}</td>
       <td><span class="visit-badge ${marcaColor(marcaNueva)}">${yes(marcaNueva)?'Sí':'No'}</span></td>
-      <td class="visit-comments">${comments.map(c=>`<span style="color:var(--acc);font-weight:600">${c.producto}:</span> ${c.comentario}`).join(' · ')||'<span style="color:var(--t3)">Sin comentarios</span>'}</td>
+      <td class="visit-comments">${
+        (r['Comentario']&&r['Comentario'].trim())
+          ? `<span style="color:var(--t2)">${r['Comentario']}</span>`
+          : comments.map(c=>`<span style="color:var(--acc);font-weight:600">${c.producto}:</span> ${c.comentario}`).join(' · ')
+          || '<span style="color:var(--t3)">Sin comentarios</span>'
+      }</td>
     </tr>`;
   }).join('');
 }
@@ -1978,7 +1834,7 @@ const REPORT_TYPES = [
     icon: '☰',
     title: 'Visitas completas',
     desc: 'Todas las visitas con datos de reposicion, espacio, modulos y repositor.',
-    cols: ['Fecha','Mes','Cadena','Sucursal','Repositor','Espacio','Reposicion OK','Modulos','Marca nueva','Mercaderia deposito'],
+    cols: ['Fecha','Mes','Cadena','Sucursal','Repositor','Espacio','Sin faltantes','Modulos','Marca nueva','Mercaderia deposito'],
     fn: (D) => D.map(r => {
       const p = (r['Supermercado y Sucursal']||'').split('|');
       return {
@@ -1988,7 +1844,7 @@ const REPORT_TYPES = [
         Sucursal: p[1]||p[0]||'',
         Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
         'Espacio': r['\u00bfCrecimos o perdimos espacio?']||'',
-        'Reposicion OK': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
+        'Sin faltantes': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
         Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
         'Marca nueva': r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?']||'',
         'Mercaderia deposito': r['\u00bfQued\u00f3 mercader\u00eda disponible en el dep\u00f3sito?']||''
@@ -2000,7 +1856,7 @@ const REPORT_TYPES = [
     icon: '◎',
     title: 'Reposicion por producto',
     desc: 'Estado de reposicion de cada SKU (difusor, inciensos, aromatizador, difusor home, vela votiva) por visita.',
-    cols: ['Fecha','Cadena','Sucursal','Repositor','Repuesto difusor','Inciensos','Arom. ambientes','Difusor Home','Vela Votiva','Reposicion OK','Comentarios'],
+    cols: ['Fecha','Cadena','Sucursal','Repositor','Repuesto difusor','Inciensos','Arom. ambientes','Difusor Home','Vela Votiva','Sin faltantes','Comentarios'],
     fn: (D) => D.map(r => {
       const p = (r['Supermercado y Sucursal']||'').split('|');
       const fid = String(r['FORM ID']||'');
@@ -2015,7 +1871,7 @@ const REPORT_TYPES = [
         'Arom. ambientes': r['Aromatizador ambientes']||'',
         'Difusor Home': r['Difusor Home']||'',
         'Vela Votiva': r['Vela Votiva']||'',
-        'Reposicion OK': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
+        'Sin faltantes': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
         'Comentarios repositor': coms
       };
     })
@@ -2312,2334 +2168,86 @@ function descargarReporte() {
   XLSX.writeFile(wb, filename);
 }
 
-function switchView(v,btn){
-  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-  document.getElementById('view-'+v).classList.add('active');
-  btn.classList.add('active');
-  if(v==='fotos') renderFotos();
-  if(v==='insights'&&!insightsGenerated&&allData.length>0) generateInsights(false);
-  if(v==='competencia') renderCompetencia();
-  if(v==='modulos') renderModulos();
-  if(v==='quiebres') renderQuiebres();
-  if(v==='visitas') renderVisitas();
-  if(v==='reportes') renderReporte();
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeDetail();closeAlertModal();}});
-
-loadData();
-setInterval(loadData,5*60*1000);
-</script>
-</body>
-</html>head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trade Dashboard — Organic Spa</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#F2EDE4;--surface:#FDFAF6;--s2:#EAE4D9;
-  --b:rgba(61,90,62,0.12);--bs:rgba(61,90,62,0.22);
-  --t:#2C2C2A;--t2:#5C5A52;--t3:#9A9688;
-  --green:#3D5A3E;--gbg:#E8F0E8;
-  --amber:#8B6914;--abg:#F5EDD8;
-  --red:#8B3A2E;--rbg:#F5E8E6;
-  --blue:#2B4A6B;--bbg:#E6EDF5;
-  --acc:#3D5A3E;--acc2:#7A9E7E;--gold:#C4A882;
-  --r:12px;--rs:8px;
-}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;font-size:14px}
-/* Subtle organic texture overlay */
-.sidebar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,rgba(196,168,130,0.08),transparent);pointer-events:none}
-.layout{display:flex;min-height:100vh}
-.sidebar{width:220px;background:#FDFAF6;border-right:1px solid var(--b);padding:24px 0;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
-.brand{padding:0 20px 20px;border-bottom:1px solid var(--b);margin-bottom:16px}
-.brand-name{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
-.brand-sub{font-size:11px;color:var(--t3);margin-top:2px}
-.nav-section{padding:0 12px}
-.nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:0 8px;margin:12px 0 4px}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;color:var(--t2);font-size:13px;border:none;background:none;width:100%;text-align:left;transition:all .15s}
-.nav-item:hover{background:var(--s2);color:var(--t)}
-.nav-item.active{background:var(--acc);color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(61,90,62,0.25)}
-.sidebar-footer{margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--b)}
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#7A9E7E;margin-right:5px;animation:pulse 2s infinite}
-.dot.red{background:#e53935}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.upd{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace}
-.main{margin-left:220px;flex:1;padding:32px;max-width:1200px}
-.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
-.pt{font-size:22px;font-weight:600}.ps{font-size:13px;color:var(--t2);margin-top:3px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-select{font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 28px 7px 12px;border-radius:var(--rs);border:1px solid var(--bs);background:var(--surface);color:var(--t);cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236b6a65' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
-.mc{background:var(--surface);border-radius:var(--r);padding:18px 20px;border:1px solid var(--b);border-top:2px solid var(--gold)}
-.ml{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
-.mv{font-size:28px;font-weight:600;font-family:'DM Mono',monospace;line-height:1}
-.mv.g{color:var(--green)}.mv.a{color:var(--amber)}.mv.r{color:var(--red)}
-.ms{font-size:11px;color:var(--t3);margin-top:6px}
-.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:20px 22px;margin-bottom:16px}
-.ct{font-size:13px;font-weight:600;margin-bottom:16px}
-.cr{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding:0 12px 12px;border-bottom:1px solid var(--b)}
-tbody td{padding:11px 12px;border-bottom:1px solid var(--b)}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:var(--s2)}
-.tn{font-weight:500}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;font-family:'DM Mono',monospace}
-.bg{background:var(--gbg);color:var(--green)}
-.br{background:var(--rbg);color:var(--red)}
-.ba{background:var(--abg);color:var(--amber)}
-.bb{background:var(--bbg);color:var(--blue)}
-.bgr{background:var(--s2);color:var(--t2)}
-.alert{display:flex;gap:12px;padding:14px 16px;border-radius:var(--rs);margin-bottom:10px;font-size:13px}
-.alert.r{background:var(--rbg);border:1px solid rgba(155,44,44,.15)}
-.alert.a{background:var(--abg);border:1px solid rgba(138,92,0,.15)}
-.alert.g{background:var(--gbg);border:1px solid rgba(45,106,45,.15)}
-.ai{font-size:16px;flex-shrink:0}
-.at{font-weight:600;margin-bottom:2px}
-.ad{color:var(--t2);font-size:12px;line-height:1.5}
-.leg{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px;font-size:12px;color:var(--t2)}
-.leg span{display:flex;align-items:center;gap:5px}
-.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-.view{display:none}.view.active{display:block}
-.spin{display:flex;align-items:center;justify-content:center;gap:10px;padding:60px;color:var(--t3);font-size:13px}
-.sp{width:18px;height:18px;border:2px solid var(--b);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.err{background:var(--rbg);border:1px solid rgba(155,44,44,.2);border-radius:var(--rs);padding:16px 20px;color:var(--red);font-size:13px;margin-bottom:16px;display:none;line-height:1.6}
-
-/* INSIGHTS PAGE */
-.insight-ai{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
-.insight-ai::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--gold))}
-.insight-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.insight-badge{background:var(--gbg);color:var(--green);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:.04em}
-.insight-date{font-size:12px;color:var(--t3);font-family:'DM Mono',monospace}
-.insight-text{font-size:14px;line-height:1.8;color:var(--t2);white-space:pre-wrap}
-.insight-loading{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:13px;padding:8px 0}
-.insight-sp{width:14px;height:14px;border:2px solid var(--b);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
-.kpi-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:18px 20px}
-.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.kpi-label{font-size:12px;color:var(--t2);font-weight:500}
-.kpi-semaforo{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.kpi-semaforo.g{background:#3D5A3E}
-.kpi-semaforo.a{background:#C4A882}
-.kpi-semaforo.r{background:#8B3A2E}
-.kpi-value{font-size:32px;font-weight:600;font-family:'DM Mono',monospace;line-height:1;margin-bottom:4px}
-.kpi-trend{font-size:12px;color:var(--t3)}
-.kpi-bar{height:4px;background:var(--s2);border-radius:2px;margin-top:12px;overflow:hidden}
-.kpi-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
-
-.regenerate-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:var(--rs);border:1px solid var(--bs);background:var(--surface);color:var(--t2);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.regenerate-btn:hover{background:var(--s2);color:var(--t)}
-
-/* FOTOS PAGE */
-.foto-filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-.foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.foto-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);overflow:hidden;transition:transform .15s}
-.foto-card:hover{transform:translateY(-2px)}
-.foto-card-header{padding:12px 14px;border-bottom:1px solid var(--b)}
-.foto-card-title{font-size:13px;font-weight:600;color:var(--t)}
-.foto-card-sub{font-size:11px;color:var(--t3);margin-top:2px;font-family:'DM Mono',monospace}
-.foto-imgs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b)}
-.foto-img{aspect-ratio:1;overflow:hidden;background:var(--s2);cursor:pointer;position:relative}
-.foto-img img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
-.foto-img:hover img{transform:scale(1.05)}
-.foto-img-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:3px 6px;font-family:'DM Mono',monospace}
-.foto-empty{text-align:center;padding:60px 20px;color:var(--t3);font-size:13px;grid-column:1/-1}
-.foto-count{font-size:12px;color:var(--t3);margin-bottom:16px}
-/* DETALLE FORMULARIO */
-.detail-view{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:400;display:none;flex-direction:column;overflow:hidden}
-.detail-view.open{display:flex}
-.detail-nav{background:var(--surface);border-bottom:1px solid var(--b);padding:16px 24px;display:flex;align-items:center;gap:16px;flex-shrink:0}
-.detail-back{background:none;border:1px solid var(--bs);border-radius:var(--rs);padding:7px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--acc);display:flex;align-items:center;gap:6px;transition:all .15s;font-weight:500}
-.detail-back:hover{background:var(--gbg);color:var(--acc)}
-.detail-info{flex:1}
-.detail-title{font-size:15px;font-weight:600;color:var(--t)}
-.detail-meta{font-size:12px;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px}
-.detail-body{flex:1;overflow-y:auto;padding:24px}
-.detail-section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--b)}
-.detail-section-title:first-child{margin-top:0}
-.detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:8px}
-.detail-photo{border-radius:var(--rs);overflow:hidden;background:var(--s2);cursor:pointer;position:relative;aspect-ratio:4/3}
-.detail-photo img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
-.detail-photo:hover img{transform:scale(1.03)}
-.detail-photo-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:6px 10px;font-family:'DM Mono',monospace}
-.detail-data{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:16px 20px;margin-bottom:16px}
-.detail-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);font-size:13px}
-.detail-row:last-child{border-bottom:none}
-.detail-key{color:var(--t2)}.detail-val{font-weight:500;color:var(--t);text-align:right;max-width:60%}
-.foto-card{cursor:pointer}
-.foto-card-hover{position:relative}
-.foto-card-hover::after{content:'Ver todas las fotos →';position:absolute;bottom:0;left:0;right:0;background:rgba(26,25,22,.7);color:#fff;font-size:12px;padding:10px;text-align:center;opacity:0;transition:opacity .2s;font-family:'DM Sans',sans-serif}
-.foto-card-hover:hover::after{opacity:1}
-
-/* LIGHTBOX */
-.lightbox{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:1000;display:none;align-items:center;justify-content:center;flex-direction:column}
-.lightbox.open{display:flex}
-.lightbox img{max-width:90vw;max-height:80vh;object-fit:contain;border-radius:var(--rs)}
-.lightbox-close{position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:8px}
-.lightbox-label{color:#fff;font-size:13px;margin-top:12px;opacity:.7}
-/* DRILLDOWN PANEL */
-.drilldown{position:fixed;top:0;right:-420px;bottom:0;width:420px;background:var(--surface);border-left:1px solid var(--b);z-index:500;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.08);transition:right .25s ease}
-.drilldown.open{right:0}
-.drilldown-header{padding:20px 24px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.drilldown-title{font-size:15px;font-weight:600}
-.drilldown-subtitle{font-size:12px;color:var(--t3);margin-top:2px}
-.drilldown-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--t2);padding:4px;line-height:1}
-.drilldown-body{padding:16px 24px;overflow-y:auto;flex:1}
-.drilldown-item{padding:14px 0;border-bottom:1px solid var(--b)}
-.drilldown-item:last-child{border-bottom:none}
-.drilldown-sucursal{font-size:13px;font-weight:600;color:var(--t);margin-bottom:4px}
-.drilldown-cadena{font-size:11px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-.drilldown-meta{font-size:12px;color:var(--t2);font-family:'DM Mono',monospace}
-.drilldown-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:499;display:none;background:rgba(0,0,0,.2)}
-.drilldown-overlay.open{display:block}
-.chart-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:8px;font-style:italic}
-
-
-/* REPORTES PAGE */
-.rep-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.rep-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:var(--surface);border-radius:var(--r);padding:18px 20px;border:1px solid var(--b);margin-bottom:16px}
-.rep-filter-group{display:flex;flex-direction:column;gap:5px}
-.rep-filter-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
-.rep-filter-group select{padding:7px 10px;border:1px solid var(--b);border-radius:var(--rs);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--t);background:var(--surface);cursor:pointer;min-width:140px}
-.rep-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
-.rep-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:16px 18px;cursor:pointer;transition:all .15s;border-left:3px solid var(--b)}
-.rep-card:hover{border-color:var(--acc);box-shadow:0 2px 12px rgba(61,90,62,0.1)}
-.rep-card.selected{border-left-color:var(--acc);background:var(--gbg)}
-.rep-card-title{font-size:13px;font-weight:600;color:var(--t);margin-bottom:4px}
-.rep-card-desc{font-size:11px;color:var(--t3);line-height:1.5}
-.rep-card-icon{font-size:20px;margin-bottom:8px}
-.rep-preview{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);overflow:hidden}
-.rep-preview-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--b);background:var(--s2)}
-.rep-preview-title{font-size:13px;font-weight:600;color:var(--t)}
-.rep-count{font-size:11px;color:var(--t3)}
-.rep-table-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
-.rep-table{width:100%;border-collapse:collapse;font-size:12px}
-.rep-table thead th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding:9px 12px;border-bottom:2px solid var(--b);background:var(--surface);position:sticky;top:0;white-space:nowrap}
-.rep-table tbody td{padding:9px 12px;border-bottom:1px solid var(--b);color:var(--t2);vertical-align:top;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rep-table tbody tr:hover td{background:var(--s2)}
-.rep-table tbody tr:last-child td{border-bottom:none}
-.dl-btn{display:flex;align-items:center;gap:7px;background:var(--acc);color:#fff;border:none;border-radius:var(--rs);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.dl-btn:hover{background:var(--mid, #5C7A5E);transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,90,62,0.25)}
-.dl-btn svg{width:15px;height:15px}
-.rep-empty{text-align:center;padding:50px;color:var(--t3);font-size:13px}
-@media(max-width:768px){.sidebar{width:100%;position:relative}.main{margin-left:0;padding:16px}.cr{grid-template-columns:1fr}.foto-imgs{grid-template-columns:1fr 1fr}}
-/* CLICKABLE ALERTS */
-.alert{cursor:pointer;transition:filter .15s,transform .15s}
-.alert:hover{filter:brightness(.97);transform:translateX(3px)}
-.alert-arrow{font-size:14px;margin-left:auto;opacity:.5;flex-shrink:0}
-/* ALERT DETAIL MODAL */
-.alert-modal{position:fixed;top:0;left:0;right:0;bottom:0;z-index:600;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
-.alert-modal.open{display:flex}
-.alert-modal-box{background:var(--surface);border-radius:var(--r);padding:28px 32px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.15)}
-.alert-modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--t3)}
-.alert-modal-title{font-size:17px;font-weight:600;margin-bottom:4px;color:var(--t)}
-.alert-modal-sub{font-size:12px;color:var(--t3);margin-bottom:20px}
-.alert-modal-section{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin:16px 0 8px}
-.alert-modal-item{padding:10px 12px;background:var(--s2);border-radius:var(--rs);margin-bottom:6px;font-size:13px}
-.alert-modal-item-title{font-weight:600;color:var(--t);margin-bottom:2px}
-.alert-modal-item-meta{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace}
-.alert-modal-comment{font-size:12px;color:var(--t2);margin-top:4px;padding:4px 8px;background:var(--surface);border-radius:4px;border-left:2px solid var(--acc2)}
-/* VISITAS PAGE */
-.visitas-table-wrap{overflow-x:auto}
-.visitas-table{width:100%;border-collapse:collapse;font-size:13px}
-.visitas-table thead th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding:0 12px 12px;border-bottom:1px solid var(--b);white-space:nowrap}
-.visitas-table tbody td{padding:11px 12px;border-bottom:1px solid var(--b);vertical-align:top}
-.visitas-table tbody tr:hover td{background:var(--s2);cursor:pointer}
-.visitas-table tbody tr:last-child td{border-bottom:none}
-.visit-suc{font-weight:600;color:var(--t);font-size:13px}
-.visit-cadena{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em}
-.visit-comments{font-size:11px;color:var(--t2);margin-top:4px;line-height:1.5;max-width:260px}
-.visit-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap}
-/* COMPETENCIA PAGE */
-.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.comp-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);overflow:hidden;border-left:3px solid var(--red)}
-.comp-card-header{padding:14px 16px;border-bottom:1px solid var(--b)}
-.comp-card-title{font-size:13px;font-weight:600;color:var(--t)}
-.comp-card-meta{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;margin-top:3px}
-.comp-card-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:pointer;transition:transform .2s}
-.comp-card-img:hover{transform:scale(1.02)}
-.comp-card-noimg{width:100%;aspect-ratio:4/3;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:12px}
-.comp-empty{text-align:center;padding:60px;color:var(--t3);font-size:13px}
-.comp-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.comp-count{font-size:12px;color:var(--t3);margin-bottom:16px}
-/* MODULOS PAGE */
-.mod-filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
-.mod-chart-wrap{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:20px;margin-bottom:16px}
-/* QUIEBRES PAGE */
-.quiebres-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.quiebre-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);padding:18px}
-.quiebre-title{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--t)}
-.quiebre-pct{font-size:28px;font-weight:600;font-family:'DM Mono',monospace;margin:8px 0 4px}
-.quiebre-bar{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-top:8px}
-.quiebre-bar-fill{height:100%;border-radius:3px;transition:width .5s}
-.quiebre-meta{font-size:11px;color:var(--t3);margin-top:4px}
-/* REPO ACCORDION */
-.repo-row{cursor:pointer;user-select:none}
-.repo-row:hover td{background:var(--s2)}
-.repo-row td{transition:background .15s}
-.repo-chevron{display:inline-block;transition:transform .2s;font-size:12px;color:var(--t3);margin-left:6px}
-.repo-chevron.open{transform:rotate(90deg)}
-.repo-detail{display:none;background:var(--s2)}
-.repo-detail.open{display:table-row}
-.repo-detail td{padding:12px 16px 16px 16px!important;border-bottom:1px solid var(--b)}
-.repo-suc-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.repo-suc-item{background:var(--surface);border:1px solid var(--b);border-radius:var(--rs);padding:8px 12px;font-size:12px;min-width:180px;flex:1}
-.repo-suc-name{font-weight:600;color:var(--t);font-size:12px;margin-bottom:2px}
-.repo-suc-cadena{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-.repo-suc-meta{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-</head>
-<body>
-<div class="layout">
-<aside class="sidebar">
-  <div class="brand">
-    <img src="https://organicspa.com.ar/cdn/shop/files/Logotipo.png?v=1756826642" alt="Organic Spa" style="width:140px;display:block;margin-bottom:10px;filter:brightness(0) saturate(100%) invert(27%) sepia(18%) saturate(800%) hue-rotate(80deg) brightness(85%)">
-    <div class="brand-sub" style="color:var(--acc2);font-size:11px;letter-spacing:.06em;font-weight:500;text-transform:uppercase">Trade Dashboard</div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label">Vistas</div>
-    <button class="nav-item active" onclick="switchView('resumen',this)">◈ Resumen</button>
-    <button class="nav-item" onclick="switchView('cadenas',this)">◉ Por cadena</button>
-    <button class="nav-item" onclick="switchView('alertas',this)">◎ Alertas</button>
-    <button class="nav-item" onclick="switchView('repos',this)">◷ Repositores</button>
-    <button class="nav-item" onclick="switchView('insights',this)">✦ Insights IA</button>
-    <button class="nav-item" onclick="switchView('fotos',this)">⬡ Fotos de góndola</button>
-    <button class="nav-item" onclick="switchView('visitas',this)">☰ Visitas</button>
-    <button class="nav-item" onclick="switchView('competencia',this)">⚑ Competencia</button>
-    <button class="nav-item" onclick="switchView('modulos',this)">◫ Módulos</button>
-    <button class="nav-item" onclick="switchView('quiebres',this)">◻ Quiebres</button>
-    <button class="nav-item" onclick="switchView('reportes',this)">⬇ Reportes</button>
-  </div>
-  <div class="sidebar-footer">
-    <div class="upd"><span class="dot" id="statusDot"></span><span id="lastUpdate">Conectando...</span></div>
-    <div style="font-size:11px;color:var(--t3);margin-top:4px">Auto-refresh: 5 min</div>
-  </div>
-</aside>
-<main class="main">
-
-  <!-- RESUMEN -->
-  <div id="view-resumen" class="view active">
-    <div class="ph">
-      <div><div class="pt">Reposición en góndola</div><div class="ps">Datos en tiempo real · Formulario Datascope</div></div>
-      <div class="filters">
-        <select id="mesFilter" onchange="render()"><option value="all">Todos los meses</option></select>
-        <select id="cadenaFilter" onchange="render()"><option value="all">Todas las cadenas</option></select>
-      </div>
-    </div>
-    <div id="err" class="err"></div>
-    <div class="mg" id="mg"><div class="spin"><div class="sp"></div>Cargando datos...</div></div>
-    <div class="cr">
-      <div class="card"><div class="ct">Espacio en góndola</div><div class="leg" id="leg1"></div><div style="position:relative;height:200px"><canvas id="c1" role="img" aria-label="espacio gondola"></canvas></div></div>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div class="ct" style="margin-bottom:0">Cadenas — Volumen vs Reposición</div>
-          <div style="font-size:11px;color:var(--t3)">Cada punto = una cadena</div>
-        </div>
-        <div style="position:relative;height:220px"><canvas id="c2" role="img" aria-label="scatter cadenas volumen vs reposicion"></canvas></div>
-        <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--t3);flex-wrap:wrap">
-          <span>● Tamaño = módulos promedio</span>
-          <span style="color:var(--red)">■ Zona crítica</span>
-          <span style="color:var(--green)">■ Zona ideal</span>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div class="ct" style="margin-bottom:0">Espacio en góndola por cadena</div>
-        <div style="display:flex;gap:10px;font-size:11px;color:var(--t2)">
-          <span><span style="display:inline-block;width:8px;height:8px;background:#3D5A3E;border-radius:2px;margin-right:3px"></span>Crecimos</span>
-          <span><span style="display:inline-block;width:8px;height:8px;background:#C4A882;border-radius:2px;margin-right:3px"></span>Igual</span>
-          <span><span style="display:inline-block;width:8px;height:8px;background:#8B3A2E;border-radius:2px;margin-right:3px"></span>Perdimos</span>
-        </div>
-      </div>
-      <div style="position:relative" id="c3w"><canvas id="c3" role="img" aria-label="espacio por cadena"></canvas></div>
-    </div>
-  </div>
-
-  <!-- CADENAS -->
-  <div id="view-cadenas" class="view">
-    <div class="ph"><div><div class="pt">Por cadena</div><div class="ps">Performance de reposición por cadena</div></div></div>
-    <div class="card"><div class="ct">Performance por cadena</div>
-      <div class="tw"><table><thead><tr><th>Cadena</th><th>Visitas</th><th>Reposición OK</th><th>Crecimos</th><th>Perdimos</th><th>Marca nueva</th><th>Módulos</th></tr></thead><tbody id="tb1"></tbody></table></div>
-    </div>
-  </div>
-
-  <!-- ALERTAS -->
-  <div id="view-alertas" class="view">
-    <div class="ph"><div><div class="pt">Alertas</div><div class="ps">Situaciones que requieren atención</div></div></div>
-    <div id="ac"><div class="spin"><div class="sp"></div>Procesando...</div></div>
-  </div>
-
-  <!-- REPOSITORES -->
-  <div id="view-repos" class="view">
-    <div class="ph"><div><div class="pt">Repositores</div><div class="ps">Performance individual del equipo</div></div></div>
-    <div class="card"><div class="ct">Performance por repositor</div>
-      <div class="tw"><table><thead><tr><th>Repositor</th><th>Visitas</th><th>Reposición completa</th><th>Cadenas cubiertas</th><th></th></tr></thead><tbody id="tb2"></tbody></table></div>
-    </div>
-  </div>
-
-  <!-- INSIGHTS IA -->
-  <div id="view-insights" class="view">
-    <div class="ph">
-      <div><div class="pt">Insights IA</div><div class="ps">Análisis automático generado por inteligencia artificial</div></div>
-      <button class="regenerate-btn" onclick="generateInsights(true)">↻ Regenerar análisis</button>
-    </div>
-    <div class="kpi-grid" id="kpiGrid"></div>
-    <div class="insight-ai">
-      <div class="insight-header">
-        <span class="insight-badge">ANÁLISIS IA</span>
-        <span class="insight-date" id="insightDate">—</span>
-      </div>
-      <div id="insightText"><div class="insight-loading"><div class="insight-sp"></div>Generando análisis con IA...</div></div>
-    </div>
-  </div>
-
-  <!-- FOTOS -->
-  <div id="view-fotos" class="view">
-    <div class="ph"><div><div class="pt">Fotos de góndola</div><div class="ps">Registro visual de reposiciones</div></div></div>
-    <div class="foto-filters">
-      <select id="fotosCadena" onchange="renderFotos()"><option value="all">Todas las cadenas</option></select>
-      <select id="fotosSucursal" onchange="renderFotos()"><option value="all">Todas las sucursales</option></select>
-      <select id="fotosMes" onchange="renderFotos()"><option value="all">Todos los meses</option></select>
-    </div>
-    <div class="foto-count" id="fotoCount"></div>
-    <div class="foto-grid" id="fotoGrid"></div>
-  </div>
-
-  <!-- VISITAS -->
-  <div id="view-visitas" class="view">
-    <div class="ph">
-      <div><div class="pt">Últimas visitas</div><div class="ps">Registro cronológico de todas las reposiciones</div></div>
-      <div class="filters">
-        <select id="visitasCadena" onchange="renderVisitas()"><option value="all">Todas las cadenas</option></select>
-        <select id="visitasMes" onchange="renderVisitas()"><option value="all">Todos los meses</option></select>
-        <select id="visitasRepo" onchange="renderVisitas()"><option value="all">Todos los repositores</option></select>
-      </div>
-    </div>
-    <div class="comp-count" id="visitasCount"></div>
-    <div class="visitas-table-wrap">
-      <table class="visitas-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Sucursal</th>
-            <th>Repositor</th>
-            <th>Espacio</th>
-            <th>Reposición</th>
-            <th>Módulos</th>
-            <th>Marca nueva</th>
-            <th>Comentarios repositor</th>
-          </tr>
-        </thead>
-        <tbody id="visitasBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- COMPETENCIA -->
-  <div id="view-competencia" class="view">
-    <div class="ph"><div><div class="pt">Competencia detectada</div><div class="ps">Solo visitas donde ingresó una marca nueva · con foto de góndola</div></div></div>
-    <div class="comp-filters">
-      <select id="compCadena" onchange="renderCompetencia()"><option value="all">Todas las cadenas</option></select>
-      <select id="compMes" onchange="renderCompetencia()"><option value="all">Todos los meses</option></select>
-    </div>
-    <div class="comp-count" id="compCount"></div>
-    <div class="comp-grid" id="compGrid"></div>
-  </div>
-
-  <!-- MÓDULOS -->
-  <div id="view-modulos" class="view">
-    <div class="ph"><div><div class="pt">Módulos por sucursal</div><div class="ps">Evolución cronológica de módulos / punteras / exhibidores</div></div></div>
-    <div class="mod-filters">
-      <select id="modCadena" onchange="renderModulos()"><option value="all">Todas las cadenas</option></select>
-      <select id="modSucursal" onchange="renderModulos()"><option value="all">Todas las sucursales</option></select>
-    </div>
-    <div class="mod-chart-wrap">
-      <div style="position:relative;height:400px"><canvas id="cMod" role="img" aria-label="módulos por sucursal cronológico"></canvas></div>
-    </div>
-  </div>
-
-  <!-- QUIEBRES -->
-  <div id="view-quiebres" class="view">
-    <div class="ph"><div><div class="pt">Quiebres por producto</div><div class="ps">Qué tan seguido no se pudo reponer cada producto</div></div></div>
-    <div class="comp-filters">
-      <select id="qCadena" onchange="renderQuiebres()"><option value="all">Todas las cadenas</option></select>
-      <select id="qMes" onchange="renderQuiebres()"><option value="all">Todos los meses</option></select>
-    </div>
-    <div class="quiebres-grid" id="quiebresGrid"></div>
-    <div class="mod-chart-wrap" style="margin-top:16px">
-      <div class="ct">Quiebres a lo largo del tiempo</div>
-      <div style="position:relative;height:300px"><canvas id="cQuiebres" role="img" aria-label="quiebres por producto en el tiempo"></canvas></div>
-  
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
-
-      <!-- Ranking fragancias faltantes -->
-      <div class="mod-chart-wrap" style="margin-top:0">
-        <div class="ct" style="margin-bottom:12px">Fragancias mas reportadas como faltantes</div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">Extraido de comentarios libres de repositores</div>
-        <div id="fragRankingList"></div>
-      </div>
-
-      <!-- Stock critico -->
-      <div class="mod-chart-wrap" style="margin-top:0">
-        <div class="ct" style="margin-bottom:12px">Alertas de stock bajo <span id="stockCriticoCount" style="font-size:11px;color:var(--red);font-weight:normal"></span></div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">Repositores que reportaron 0-2 unidades disponibles</div>
-        <div id="stockCriticoList" style="max-height:280px;overflow-y:auto"></div>
-      </div>
-
-    </div>
-  </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
-
-      <!-- Ranking fragancias faltantes -->
-      <div class="mod-chart-wrap" style="margin-top:0">
-        <div class="ct" style="margin-bottom:12px">Fragancias mas reportadas como faltantes</div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">Extraido de comentarios libres de repositores</div>
-        <div id="fragRankingList"></div>
-      </div>
-
-      <!-- Stock critico -->
-      <div class="mod-chart-wrap" style="margin-top:0">
-        <div class="ct" style="margin-bottom:12px">Alertas de stock bajo <span id="stockCriticoCount" style="font-size:11px;color:var(--red);font-weight:normal"></span></div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">Repositores que reportaron 0-2 unidades disponibles</div>
-        <div id="stockCriticoList" style="max-height:280px;overflow-y:auto"></div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- REPORTES -->
-  <div id="view-reportes" class="view">
-    <div class="ph">
-      <div><div class="pt">Reportes</div><div class="ps">Filtra, previsualiza y descarga reportes en Excel con un clic</div></div>
-    </div>
-    <div class="rep-filters">
-      <div class="rep-filter-group">
-        <span class="rep-filter-label">Cadena</span>
-        <select id="repCadena" onchange="renderReporte()"><option value="all">Todas las cadenas</option></select>
-      </div>
-      <div class="rep-filter-group">
-        <span class="rep-filter-label">Mes</span>
-        <select id="repMes" onchange="renderReporte()"><option value="all">Todos los meses</option></select>
-      </div>
-      <div class="rep-filter-group">
-        <span class="rep-filter-label">Repositor</span>
-        <select id="repRepo" onchange="renderReporte()"><option value="all">Todos</option></select>
-      </div>
-      <div class="rep-filter-group">
-        <span class="rep-filter-label">Espacio</span>
-        <select id="repEspacio" onchange="renderReporte()">
-          <option value="all">Todos</option>
-          <option value="creci">Crecimos</option>
-          <option value="perdi">Perdimos</option>
-          <option value="igual">Igual</option>
-        </select>
-      </div>
-      <div class="rep-filter-group" style="margin-left:auto">
-        <span class="rep-filter-label">&nbsp;</span>
-        <button class="dl-btn" onclick="descargarReporte()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Descargar Excel
-        </button>
-      </div>
-    </div>
-    <div class="rep-cards" id="repCards"></div>
-    <div class="rep-preview">
-      <div class="rep-preview-header">
-        <div>
-          <div class="rep-preview-title" id="repPreviewTitle">Selecciona un tipo de reporte</div>
-          <div class="rep-count" id="repPreviewCount"></div>
-        </div>
-      </div>
-      <div class="rep-table-wrap">
-        <table class="rep-table">
-          <thead id="repThead"></thead>
-          <tbody id="repTbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-</main>
-</div>
-
-<!-- DETAIL VIEW -->
-<div class="detail-view" id="detailView">
-  <div class="detail-nav">
-    <button class="detail-back" onclick="closeDetail()">← Volver</button>
-    <div class="detail-info">
-      <div class="detail-title" id="detailTitle">—</div>
-      <div class="detail-meta" id="detailMeta">—</div>
-    </div>
-  </div>
-  <div class="detail-body" id="detailBody"></div>
-</div>
-
-<!-- ALERT MODAL -->
-<div class="alert-modal" id="alertModal" onclick="if(event.target===this)closeAlertModal()">
-  <div class="alert-modal-box">
-    <button class="alert-modal-close" onclick="closeAlertModal()">✕</button>
-    <div class="alert-modal-title" id="alertModalTitle"></div>
-    <div class="alert-modal-sub" id="alertModalSub"></div>
-    <div id="alertModalBody"></div>
-  </div>
-</div>
-
-<!-- DRILLDOWN OVERLAY -->
-<div class="drilldown-overlay" id="ddOverlay" onclick="closeDrilldown()"></div>
-
-<!-- DRILLDOWN PANEL -->
-<div class="drilldown" id="drilldown">
-  <div class="drilldown-header">
-    <div>
-      <div class="drilldown-title" id="ddTitle">—</div>
-      <div class="drilldown-subtitle" id="ddSubtitle">—</div>
-    </div>
-    <button class="drilldown-close" onclick="closeDrilldown()">✕</button>
-  </div>
-  <div class="drilldown-body" id="ddBody"></div>
-</div>
-
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lightboxImg" src="" alt="">
-  <div class="lightbox-label" id="lightboxLabel"></div>
-</div>
-
-<script>
-const SID = '1U6YMhvEEgM6O1DwLDO4Kvh0NLFeEuPl1T0T6r5-gOco';
-const SNAME = 'Consolidado';
-let allData = [], CH = {}, insightsGenerated = false;
-
-function setStatus(ok,msg){document.getElementById('statusDot').className='dot'+(ok?'':' red');document.getElementById('lastUpdate').textContent=msg;}
-function showErr(msg){const e=document.getElementById('err');e.style.display='block';e.innerHTML=msg;}
-
-function parseGviz(raw){
-  const start=raw.indexOf('{'),end=raw.lastIndexOf('}');
-  if(start===-1||end===-1) throw new Error('No JSON encontrado');
-  return JSON.parse(raw.substring(start,end+1));
-}
-
-function gvizToRows(json){
-  const cols=json.table.cols.map(c=>(c.label||c.id||'').trim());
-  return json.table.rows.filter(r=>r&&r.c).map(r=>{
-    const obj={};
-    cols.forEach((c,i)=>{
-      const cell=r.c[i];
-      if(!cell||cell.v===null||cell.v===undefined){obj[c]='';return;}
-      const raw=cell.f!==undefined&&cell.f!==null?String(cell.f):String(cell.v);
-      obj[c]=raw.trim();
-    });
-    return obj;
-  }).filter(r=>r['FORM ID']&&r['FORM ID']!=='');
-}
-
-
-// ── FRAGANCIA PARSER (global) ────────────────────────────────────────────
-const FRAGANCIA_MAP = [
-  { name:'Maracuya',          keys:['maracuy'] },
-  { name:'Citrus',            keys:['citrus'] },
-  { name:'Coco & Vainilla',   keys:['coco','coco y vainilla','coco vainilla'] },
-  { name:'Sandia & Pepino',   keys:['sandia','sandía','pepino'] },
-  { name:'Verbena & Fresias', keys:['verbena','fresias','verbenia'] },
-  { name:'Jazmin & Bambu',    keys:['jazmin','jazmín','bambu','bambú'] },
-  { name:'Gardenia',          keys:['gardenia','gardeña'] },
-  { name:'Sandalo & Vainilla',keys:['sandalo','sándalo'] },
-  { name:'Manzana & Canela',  keys:['manzana','canela'] },
-  { name:'Vainilla',          keys:['vainilla'] },
-  { name:'Vela Votiva',       keys:['votiva'] },
-  { name:'Difusor Home',      keys:['difusor home'] },
-  { name:'Repuesto Difusor',  keys:['repuesto difusor','repuesto'] },
-  { name:'Inciensos',         keys:['incienso'] },
-];
-
-function parseFragancias(txt) {
-  const t = (txt||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  return FRAGANCIA_MAP.filter(f => f.keys.some(k => t.includes(k))).map(f => f.name);
-}
-
-function parseUnidades(txt) {
-  const t = (txt||'').toLowerCase();
-  if (/no ten(emos|go)\s*(nada|stock)/i.test(t) || /sin\s*stock/i.test(t)) return 0;
-  const m = t.match(/(?:quedan?|solo\s+tenemos?|disponibles?|tenemos?)\s*(\d+)/i);
-  if (m) return parseInt(m[1]);
-  return null;
-}
-// ─────────────────────────────────────────────────────────────────────────
-
-async function loadSheet(sheetName){
-  const API_KEY='AIzaSyAzZ0IVleGdiyp58-hYIEmNlo5tjdzIyRg';
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${encodeURIComponent(sheetName)}?key=${API_KEY}`;
-  const res=await fetch(url);
-  if(!res.ok) throw new Error('HTTP '+res.status+' on '+sheetName);
-  const json=await res.json();
-  const rows=json.values;
-  if(!rows||rows.length<2) return [];
-  const headers=rows[0].map(h=>String(h||'').trim());
-  return rows.slice(1).map(row=>{
-    const obj={};
-    headers.forEach((h,i)=>{const v=row[i];obj[h]=v!==undefined&&v!==null?String(v).trim():'';});
-    return obj;
-  });
-}
-
-async function loadData(){
-  try{
-    // Load both sheets in parallel
-    const [mainRows, commentRows] = await Promise.all([
-      loadSheet(SNAME),
-      loadSheet('Media&Comments-FormularioReposicinOr-633952')
-    ]);
-
-    allData=mainRows.filter(r=>r['FORM ID']&&r['FORM ID']!=='');
-    if(allData.length===0) throw new Error('Sin filas válidas');
-
-    // Build comments map: formId -> array of {producto, comentario, foto}
-    commentsMap={};
-    commentRows.forEach(r=>{
-      // Try all possible ID column names, normalize to string integer
-      const rawFid=r['Código Formulario']||r['Codigo Formulario']||r['FORM ID']||r['Form ID']||r['form_id']||'';
-      const fid=String(rawFid).split('.')[0].trim(); // remove decimals like "309.0"
-      if(!fid||fid==='') return;
-      if(!commentsMap[fid]) commentsMap[fid]=[];
-      // Try all possible question/product column names
-      const pregunta=r['Nombre Pregunta']||r['Nombre pregunta']||r['nombre_pregunta']||'';
-      // Extract product from question text
-      const producto=pregunta
-        .replace(/¿De lo que faltó,?\s*/i,'')
-        .replace(/De lo que faltó,?\s*/i,'')
-        .replace(/¿De lo que falto,?\s*/i,'')
-        .trim();
-      const comentario=r['Comentario']||r['comentario']||r['Comment']||'';
-      const foto=r['Foto']||r['foto']||r['Photo']||'';
-      if(producto||comentario){
-        commentsMap[fid].push({
-          producto,
-          comentario:comentario.trim(),
-          foto:foto.trim(),
-          respuesta:r['Respuesta Seleccionada']||r['Respuesta']||''
-        });
-      }
-    });
-    console.log('Comments loaded:',Object.keys(commentsMap).length,'forms with comments');
-    console.log('Sample comment keys:',Object.keys(commentsMap).slice(0,5));
-
-    // ── PARSE COMMENTS: extract fragancias + units from free text ──────────
-    
-
-    // Build fragancia stats across all comments
-    window.fraganciaStats = {}; // { fragName: { count, sucursales:Set, unidades:[] } }
-    window.stockCritico   = []; // { sucursal, cadena, fragancia, unidades, fecha }
-
-    Object.entries(commentsMap).forEach(([fid, coms]) => {
-      const row = allData.find(r => String(r['FORM ID']||'').split('.')[0].trim() === fid);
-      const suc = row ? (row['Supermercado y Sucursal']||'') : '';
-      const partes = suc.split('|');
-      const cadena = partes[0]||'';
-      const sucursal = partes[1]||partes[0]||'';
-      const fecha = row ? (row['Fecha respuesta']||'') : '';
-
-      coms.forEach(c => {
-        const frags = parseFragancias(c.comentario);
-        const units = parseUnidades(c.comentario);
-        frags.forEach(f => {
-          if(!window.fraganciaStats[f]) window.fraganciaStats[f] = { count:0, sucursales:new Set(), unidades:[] };
-          window.fraganciaStats[f].count++;
-          if(suc) window.fraganciaStats[f].sucursales.add(suc);
-          if(units !== null) window.fraganciaStats[f].unidades.push(units);
-          // Stock critico: 0-2 unidades
-          if(units !== null && units <= 2) {
-            window.stockCritico.push({ sucursal, cadena, fragancia:f, unidades:units, fecha, producto:c.producto });
-          }
-        });
-      });
-    });
-    console.log('Fragancia stats parsed:', Object.keys(window.fraganciaStats).length,'fragancias detectadas');
-
-    document.getElementById('err').style.display='none';
-    populateFilters();
-    setStatus(true,'Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}));
-    render();
-    if(!insightsGenerated) generateInsights(false);
-  }catch(e){
-    showErr(`<strong>Error al cargar datos.</strong> <a href="javascript:location.reload()">Reintentar</a> — ${e.message}`);
-    setStatus(false,'Sin datos');
-  }
-}
-
-const MESES_ES={'enero':'Enero','febrero':'Febrero','marzo':'Marzo','abril':'Abril','mayo':'Mayo','junio':'Junio','julio':'Julio','agosto':'Agosto','septiembre':'Septiembre','octubre':'Octubre','noviembre':'Noviembre','diciembre':'Diciembre'};
-
-function populateFilters(){
-  // Cadenas
-  const sel=document.getElementById('cadenaFilter');
-  const existing=[...sel.options].map(o=>o.value);
-  const cadenas=[...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort();
-  cadenas.forEach(c=>{if(!existing.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);}});
-
-  const fc=document.getElementById('fotosCadena');
-  const fe=[...fc.options].map(o=>o.value);
-  cadenas.forEach(c=>{if(!fe.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;fc.appendChild(o);}});
-
-  // Meses dinámicos - orden cronológico
-  const ordenMeses=Object.keys(MESES_ES);
-  const mesesEnDatos=[...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))].sort((a,b)=>ordenMeses.indexOf(a)-ordenMeses.indexOf(b));
-  ['mesFilter','fotosMes'].forEach(id=>{
-    const s=document.getElementById(id);
-    const ex=[...s.options].map(o=>o.value);
-    mesesEnDatos.forEach(m=>{if(!ex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;s.appendChild(o);}});
-  });
-}
-
-function filtered(){
-  const m=document.getElementById('mesFilter').value;
-  const c=document.getElementById('cadenaFilter').value;
-  return allData.filter(r=>{
-    const mOk=m==='all'||(r['Mes']||'').toLowerCase()===m;
-    const cOk=c==='all'||(r['Supermercado y Sucursal']||'').startsWith(c);
-    return mOk&&cOk;
-  });
-}
-
-const yes=v=>{const s=(v||'').toString().toLowerCase().trim();return s==='sí'||s==='si'||s==='yes'||s==='true'||s==='1';};
-const no=v=>{const s=(v||'').toString().toLowerCase().trim();return s==='no'||s==='false'||s==='0';};
-
-function render(){
-  const D=filtered();
-  if(!D.length) return;
-  const N=D.length;
-  const ok=D.filter(r=>yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])).length;
-  const mn=D.filter(r=>yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?'])).length;
-  const cr=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci')).length;
-  const pd=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi')).length;
-  // Build fragancia ranking for KPI card
-  const fragForKpi = {};
-  D.forEach(r => {
-    const fid = String(r['FORM ID']||'').split('.')[0].trim();
-    (commentsMap[fid]||[]).forEach(c => {
-      parseFragancias(c.comentario).forEach(f => {
-        fragForKpi[f] = (fragForKpi[f]||0) + 1;
-      });
-    });
-  });
-  const topFragKpi = Object.entries(fragForKpi).sort((a,b)=>b[1]-a[1]).slice(0,1);
-  window._topFragKpi = topFragKpi;
-
-  const mds=D.map(r=>parseFloat(r['¿Cuántos módulos / punteras / exhibidor tenemos?']||r['¿Cuantos módulos / punteras / exhibidor tenemos?']||'')).filter(v=>!isNaN(v)&&v>0);
-  const pm=mds.length?(mds.reduce((a,b)=>a+b,0)/mds.length):0;
-  const pct=Math.round(ok/N*100);
-
-  document.getElementById('mg').innerHTML=[
-    {l:'Total visitas',v:N,s:'formularios',cls:''},
-    {l:'Reposición OK',v:pct+'%',s:`${ok} de ${N}`,cls:pct>=70?'g':pct>=50?'a':'r'},
-    {l:'Crecimos espacio',v:cr,s:Math.round(cr/N*100)+'% de visitas',cls:'g'},
-    {l:'Perdimos espacio',v:pd,s:Math.round(pd/N*100)+'% de visitas',cls:pd>0?'r':'g'},
-    {l:'Marcas nuevas',v:mn,s:'ingresos competencia',cls:mn>3?'r':mn>0?'a':'g'},
-    {l:'Módulos prom.',v:pm.toFixed(1),s:'por visita',cls:''},
-  ].map(x=>`<div class="mc"><div class="ml">${x.l}</div><div class="mv ${x.cls}">${x.v}</div><div class="ms">${x.s}</div></div>`).join('');
-
-  // Fragancia critica card - from comments analysis
-  const topFrag = (window._topFragKpi||[])[0];
-  const fragCard = topFrag
-    ? `<div class="mc" style="border-top-color:var(--red)"><div class="ml">Fragancia critica</div><div class="mv r" style="font-size:16px;font-weight:700">${topFrag[0]}</div><div class="ms">${topFrag[1]} reporte${topFrag[1]!==1?'s':''} de faltante</div></div>`
-    : '';
-  const stockCriticoTotal = (window.stockCritico||[]).length;
-  const stockCard = stockCriticoTotal > 0
-    ? `<div class="mc" style="border-top-color:var(--amber)"><div class="ml">Stock critico</div><div class="mv a">${stockCriticoTotal}</div><div class="ms">casos 0-2 unidades</div></div>`
-    : '';
-  if(fragCard||stockCard) {
-    document.getElementById('mg').innerHTML += fragCard + stockCard;
-  }
-
-  renderCharts(D,N,cr,pd);
-  renderCadenas(D);
-  renderAlertas(D,N);
-  renderRepos(D);
-  renderKPIs(D,N,ok,cr,pd,mn,pm);
-}
-
-function renderCharts(D,N,cr,pd){
-  const ig=N-cr-pd;
-  if(CH.c1) CH.c1.destroy();
-  document.getElementById('leg1').innerHTML=`<span><span class="ld" style="background:#3D5A3E"></span>Crecimos ${Math.round(cr/N*100)}%</span><span><span class="ld" style="background:#C4A882"></span>Igual ${Math.round(ig/N*100)}%</span><span><span class="ld" style="background:#8B3A2E"></span>Perdimos ${Math.round(pd/N*100)}%</span>`;
-  const c1canvas=document.getElementById('c1');
-  CH.c1=new Chart(c1canvas,{type:'doughnut',data:{labels:['Crecimos','Igual','Perdimos'],datasets:[{data:[cr,ig,pd],backgroundColor:['#3D5A3E','#C4A882','#8B3A2E'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}},onClick:(e,els)=>{if(!els.length)return;const label=['Crecimos','Igual','Perdimos'][els[0].index];openDrilldown(label,D);}}});
-  c1canvas.style.cursor='pointer';
-  if(!document.getElementById('chartHint')){const h=document.createElement('div');h.id='chartHint';h.className='chart-hint';h.textContent='Tocá un segmento para ver el detalle';c1canvas.parentElement.appendChild(h);}
-
-  // CHART 2: Scatter — Volumen vs Reposición por cadena
-  const C2={};
-  D.forEach(r=>{
-    const c=(r['Supermercado y Sucursal']||'').split('|')[0]||'?';
-    if(!C2[c]) C2[c]={v:0,ok:0,mods:[]};
-    C2[c].v++;
-    if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])) C2[c].ok++;
-    const m=parseFloat(r['¿Cuántos módulos / punteras / exhibidor tenemos?']);
-    if(!isNaN(m)&&m>0) C2[c].mods.push(m);
-  });
-  const scatterData=Object.entries(C2).filter(([,d])=>d.v>=2).map(([c,d])=>{
-    const repoPct=Math.round(d.ok/d.v*100);
-    const avgMod=d.mods.length?(d.mods.reduce((a,b)=>a+b,0)/d.mods.length):2;
-    const color=repoPct>=75?'rgba(61,90,62,0.75)':repoPct>=55?'rgba(196,168,130,0.85)':'rgba(139,58,46,0.8)';
-    return {x:d.v,y:repoPct,r:Math.max(8,Math.min(avgMod*7,28)),label:c,color};
-  });
-  if(CH.c2) CH.c2.destroy();
-  CH.c2=new Chart(document.getElementById('c2'),{
-    type:'bubble',
-    data:{datasets:[{
-      data:scatterData.map(p=>({x:p.x,y:p.y,r:p.r})),
-      backgroundColor:scatterData.map(p=>p.color),
-      borderColor:scatterData.map(p=>p.color.replace('0.75','1').replace('0.85','1').replace('0.8','1')),
-      borderWidth:1,
-      hoverBorderWidth:2
-    }]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{
-          label:ctx=>{
-            const d=scatterData[ctx.dataIndex];
-            return [`${d.label}`,`Visitas: ${d.x}`,`Reposición: ${d.y}%`];
-          }
-        }}
-      },
-      scales:{
-        x:{title:{display:true,text:'Visitas',font:{size:11},color:'#9A9688'},ticks:{font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},
-        y:{title:{display:true,text:'% Reposición completa',font:{size:11},color:'#9A9688'},min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}}
-      },
-      onClick:(e,els)=>{
-        if(!els.length) return;
-        const d=scatterData[els[0].index];
-        if(d) openDrilldown('all', D.filter(r=>(r['Supermercado y Sucursal']||'').startsWith(d.label)), d.label);
-      }
-    }
-  });
-  document.getElementById('c2').style.cursor='pointer';
-  // Draw cadena labels on bubbles after render
-  CH.c2._organicLabels=scatterData;
-
-  // CHART 3: Stacked bar — Espacio por cadena (Crecimos/Igual/Perdimos)
-  const C3={};
-  D.forEach(r=>{
-    const c=(r['Supermercado y Sucursal']||'').split('|')[0]||'?';
-    if(!C3[c]) C3[c]={cr:0,ig:0,pd:0,total:0};
-    C3[c].total++;
-    const esp=(r['¿Crecimos o perdimos espacio?']||'').toLowerCase();
-    if(esp.includes('creci')) C3[c].cr++;
-    else if(esp.includes('perdi')) C3[c].pd++;
-    else C3[c].ig++;
-  });
-  const c3sorted=Object.entries(C3).sort((a,b)=>b[1].total-a[1].total);
-  const h3=Math.max(200,c3sorted.length*38+60);
-  document.getElementById('c3w').style.height=h3+'px';
-  if(CH.c3) CH.c3.destroy();
-  CH.c3=new Chart(document.getElementById('c3'),{
-    type:'bar',
-    data:{
-      labels:c3sorted.map(e=>e[0]),
-      datasets:[
-        {label:'Crecimos',data:c3sorted.map(e=>e[1].cr),backgroundColor:'#3D5A3E',borderWidth:0,borderRadius:{topLeft:0,topRight:3,bottomLeft:0,bottomRight:3}},
-        {label:'Igual',data:c3sorted.map(e=>e[1].ig),backgroundColor:'#C4A882',borderWidth:0},
-        {label:'Perdimos',data:c3sorted.map(e=>e[1].pd),backgroundColor:'#8B3A2E',borderWidth:0,borderRadius:{topLeft:0,topRight:3,bottomLeft:0,bottomRight:3}},
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{
-          label:ctx=>`${ctx.dataset.label}: ${ctx.raw} visita${ctx.raw!==1?'s':''}`,
-        }}
-      },
-      scales:{
-        x:{stacked:true,ticks:{font:{size:10},stepSize:5},grid:{color:'rgba(0,0,0,0.04)'}},
-        y:{stacked:true,ticks:{font:{size:11},autoSkip:false},grid:{display:false}}
-      },
-      onClick:(e,els)=>{
-        if(!els.length) return;
-        const cadena=c3sorted[els[0].index][0];
-        const dsIdx=els[0].datasetIndex;
-        const label=['Crecimos','Igual','Perdimos'][dsIdx];
-        openDrilldown(label, D.filter(r=>(r['Supermercado y Sucursal']||'').startsWith(cadena)), cadena);
-      }
-    }
-  });
-  document.getElementById('c3').style.cursor='pointer';
-}
-
-function renderCadenas(D){
-  const C={};
-  D.forEach(r=>{const c=(r['Supermercado y Sucursal']||'').split('|')[0]||'?';if(!C[c])C[c]={v:0,ok:0,cr:0,pd:0,mn:0,md:[]};C[c].v++;if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']))C[c].ok++;if((r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'))C[c].cr++;if((r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi'))C[c].pd++;if(yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']))C[c].mn++;const m=parseFloat(r['¿Cuántos módulos / punteras / exhibidor tenemos?']);if(!isNaN(m)&&m>0)C[c].md.push(m);});
-  document.getElementById('tb1').innerHTML=Object.entries(C).sort((a,b)=>b[1].v-a[1].v).map(([c,d])=>{const p=Math.round(d.ok/d.v*100);const pm=d.md.length?(d.md.reduce((a,b)=>a+b,0)/d.md.length).toFixed(1):'—';const cl=p>=70?'bg':p>=50?'ba':'br';return `<tr><td class="tn">${c}</td><td>${d.v}</td><td><span class="badge ${cl}">${p}%</span></td><td><span class="badge bg">${d.cr}</span></td><td><span class="badge ${d.pd>0?'br':'bgr'}">${d.pd}</span></td><td><span class="badge ${d.mn>0?'ba':'bgr'}">${d.mn}</span></td><td style="font-family:'DM Mono',monospace">${pm}</td></tr>`;}).join('');
-}
-
-// Store alert data for modal
-let alertsData = [];
-
-function renderAlertas(D,N){
-  alertsData=[];
-
-  // Pérdida de espacio
-  const pd=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi'));
-  if(pd.length){
-    const rows=pd.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—',
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'r',i:'⚑',
-      ti:`Perdimos espacio en ${pd.length} visita(s)`,
-      d:`${pd.length} sucursal${pd.length!==1?'es':''} con reducción de espacio detectada. Requiere acción comercial urgente.`,
-      detail:`Espacios perdidos detectados en ${[...new Set(rows.map(r=>r.cadena))].join(', ')}. Cada caso representa una oportunidad para el competidor.`,
-      rows,tipo:'perdida'});
-  }
-
-  // Competencia
-  const mn=D.filter(r=>yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']));
-  if(mn.length){
-    const rows=mn.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      espacio:r['¿Crecimos o perdimos espacio?']||'—',
-      mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—',
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'a',i:'!',
-      ti:`Nuevas marcas competidoras en ${mn.length} caso(s)`,
-      d:`Spirit, Aromanza o Sagrada Madre detectadas en ${[...new Set(rows.map(r=>r.suc))].slice(0,4).join(', ')}.`,
-      detail:'Presencia de competidores en el lineal. Registrar qué marca ingresó y qué espacio ocupa para negociar su remoción.',
-      rows,tipo:'competencia'});
-  }
-
-  // Reposición incompleta
-  const sr=D.filter(r=>no(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']));
-  if(sr.length){
-    const productCount={};
-    sr.forEach(r=>{
-      (commentsMap[String(r['FORM ID']||'')]||[]).forEach(c=>{
-        if(c.producto) productCount[c.producto]=(productCount[c.producto]||0)+1;
-      });
-    });
-    const topProds=Object.entries(productCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    const rows=sr.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'a',i:'!',
-      ti:`${sr.length} visitas con reposición incompleta (${Math.round(sr.length/N*100)}%)`,
-      d:topProds.length>0?`Productos más afectados: ${topProds.map(([p,n])=>`${p} (${n}x)`).join(', ')}`:`${Math.round(sr.length/N*100)}% del total de visitas sin reposición completa`,
-      detail:'Faltantes detectados por los repositores. Los comentarios debajo muestran las variantes específicas que no estaban disponibles.',
-      rows,topProds,tipo:'reposicion'});
-  }
-
-  // Sin mercadería en depósito
-  const sm=D.filter(r=>no(r['¿Quedó mercadería disponible en el depósito?']));
-  if(sm.length){
-    const rows=sm.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      comments:(commentsMap[String(r['FORM ID']||'')]||[]).filter(c=>c.comentario&&c.comentario.length>1)
-    }));
-    alertsData.push({t:'r',i:'⚑',
-      ti:`Sin mercadería en depósito: ${sm.length} caso(s)`,
-      d:`Depósitos vacíos en ${[...new Set(rows.map(r=>r.cadena))].join(', ')}. Riesgo inminente de quiebre de stock.`,
-      detail:'El repositor fue a reponer pero no encontró mercadería en el depósito de la tienda. Esto indica un problema de abastecimiento o logística que debe resolverse antes de la próxima visita.',
-      rows,tipo:'stock'});
-  }
-
-  // Variantes faltantes desde comentarios
-  const variantCount={};
-  D.forEach(r=>{
-    (commentsMap[String(r['FORM ID']||'')]||[]).forEach(c=>{
-      if(c.comentario&&c.comentario.length>2&&!['si','no','sí'].includes(c.comentario.toLowerCase().trim())){
-        const k=`${c.producto}|${c.comentario.trim().toLowerCase()}`;
-        if(!variantCount[k]) variantCount[k]={producto:c.producto,comentario:c.comentario,n:0,sucursales:[]};
-        variantCount[k].n++;
-        const suc=(D.find(r2=>{ const fid=String(r2['FORM ID']||''); return (commentsMap[fid]||[]).some(cc=>cc.comentario===c.comentario); })||{})['Supermercado y Sucursal']||'';
-        if(suc&&!variantCount[k].sucursales.includes(suc)) variantCount[k].sucursales.push(suc);
-      }
-    });
-  });
-  const topVariants=Object.values(variantCount).sort((a,b)=>b.n-a.n).slice(0,8);
-  if(topVariants.length>0){
-    alertsData.push({t:'a',i:'◎',
-      ti:`${topVariants.length} variantes reportadas como faltantes por repositores`,
-      d:topVariants.slice(0,3).map(v=>`${v.producto}: "${v.comentario}" (${v.n}x)`).join(' · '),
-      detail:'Comentarios textuales de los repositores indicando exactamente qué variante o fragancia no estaba disponible. Esta información es clave para el próximo pedido.',
-      variants:topVariants,tipo:'variantes'});
-  }
-
-  // Stock critico desde comentarios
-  const stockFiltAlerta = (window.stockCritico||[]).filter(sc => {
-    // Match against current filter data
-    return D.some(r => {
-      const p = (r['Supermercado y Sucursal']||'').split('|');
-      return p[0]===sc.cadena && (p[1]||p[0])===sc.sucursal;
-    });
-  });
-  const stockCero = stockFiltAlerta.filter(s=>s.unidades===0);
-  const stockBajo = stockFiltAlerta.filter(s=>s.unidades>0&&s.unidades<=2);
-
-  if(stockCero.length > 0){
-    const rows = stockCero.map(s=>({
-      suc: s.sucursal, cadena: s.cadena, fecha: s.fecha,
-      repo: '', mods: '', comments:[{producto:s.producto,comentario:`Sin stock: ${s.fragancia}`}]
-    }));
-    A.push({t:'r',i:'⚑',
-      ti:`Sin stock reportado: ${stockCero.length} caso${stockCero.length!==1?'s':''}`,
-      d:stockCero.slice(0,3).map(s=>`${s.fragancia} en ${s.cadena}-${s.sucursal}`).join(' · '),
-      detail:'El repositor informo que no habia ninguna unidad disponible en deposito o gondola. Requiere reposicion urgente.',
-      rows, tipo:'stockcero'});
-  }
-  if(stockBajo.length > 0){
-    const rows = stockBajo.map(s=>({
-      suc: s.sucursal, cadena: s.cadena, fecha: s.fecha,
-      repo:'', mods:'', comments:[{producto:s.producto,comentario:`${s.unidades} unidad${s.unidades!==1?'es':''}: ${s.fragancia}`}]
-    }));
-    A.push({t:'a',i:'!',
-      ti:`Stock bajo (1-2 unidades): ${stockBajo.length} caso${stockBajo.length!==1?'s':''}`,
-      d:stockBajo.slice(0,3).map(s=>`${s.fragancia} - ${s.sucursal} (${s.unidades}u)`).join(' · '),
-      detail:'Repositores que encontraron solo 1 o 2 unidades disponibles en deposito. Riesgo de quiebre en la proxima visita si no se reabastece.',
-      rows, tipo:'stockbajo'});
-  }
-
-  // Crecimos
-  const cr=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'));
-  if(cr.length){
-    const rows=cr.map(r=>({
-      suc:(r['Supermercado y Sucursal']||'').split('|')[1]||(r['Supermercado y Sucursal']||''),
-      cadena:(r['Supermercado y Sucursal']||'').split('|')[0],
-      fecha:r['Fecha respuesta']||'',
-      repo:`${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-      mods:r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—'
-    }));
-    alertsData.push({t:'g',i:'✓',
-      ti:`Crecimos espacio en ${cr.length} visita(s)`,
-      d:`Expansión de espacio en: ${[...new Set(rows.map(r=>r.suc))].slice(0,5).join(', ')}.`,
-      detail:'Excelentes resultados de negociación en góndola. Documentar qué acciones llevaron a este crecimiento para replicarlas en otras sucursales.',
-      rows,tipo:'crecimiento'});
-  }
-
-  document.getElementById('ac').innerHTML=alertsData.length
-    ?alertsData.map((a,i)=>`
-      <div class="alert ${a.t}" onclick="openAlertModal(${i})">
-        <div class="ai">${a.i}</div>
-        <div style="flex:1"><div class="at">${a.ti}</div><div class="ad">${a.d}</div></div>
-        <div class="alert-arrow">›</div>
-      </div>`).join('')
-    :'<div class="alert g"><div class="ai">✓</div><div><div class="at">Sin alertas activas</div><div class="ad">Todo en orden.</div></div></div>';
-}
-
-function openAlertModal(idx){
-  const a=alertsData[idx];
-  if(!a) return;
-  const colors={r:'var(--red)',a:'var(--amber)',g:'var(--green)'};
-  document.getElementById('alertModalTitle').innerHTML=`<span style="color:${colors[a.t]}">${a.i}</span> ${a.ti}`;
-  document.getElementById('alertModalSub').textContent=a.detail||'';
-
-  let body='';
-
-  if(a.tipo==='reposicion'&&a.topProds&&a.topProds.length>0){
-    body+=`<div class="alert-modal-section">Productos más afectados</div>`;
-    body+=a.topProds.map(([p,n])=>`<div class="alert-modal-item"><div class="alert-modal-item-title">${p}</div><div class="alert-modal-item-meta">${n} reporte${n!==1?'s':''}</div></div>`).join('');
-  }
-
-  if(a.tipo==='variantes'&&a.variants){
-    body+=`<div class="alert-modal-section">Variantes reportadas</div>`;
-    body+=a.variants.map(v=>`<div class="alert-modal-item"><div class="alert-modal-item-title">${v.producto}</div><div class="alert-modal-comment">"${v.comentario}"</div><div class="alert-modal-item-meta">${v.n} reporte${v.n!==1?'s':''}</div></div>`).join('');
-  }
-
-  if(a.rows&&a.rows.length>0){
-    body+=`<div class="alert-modal-section">Detalle por sucursal (${a.rows.length})</div>`;
-    body+=a.rows.map(r=>`<div class="alert-modal-item">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div class="alert-modal-item-title">${r.suc}</div>
-          <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em">${r.cadena}</div>
-        </div>
-        <div class="alert-modal-item-meta">${r.fecha}</div>
-      </div>
-      <div class="alert-modal-item-meta" style="margin-top:4px">${r.repo}${r.mods?' · '+r.mods+' módulos':''}</div>
-      ${r.comments&&r.comments.length>0?r.comments.map(c=>`<div class="alert-modal-comment" style="margin-top:6px"><span style="font-weight:600">${c.producto}:</span> ${c.comentario}</div>`).join(''):''}
-    </div>`).join('');
-  }
-
-  document.getElementById('alertModalBody').innerHTML=body||'<p style="color:var(--t2);font-size:13px">Sin datos adicionales disponibles.</p>';
-  document.getElementById('alertModal').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
-function closeAlertModal(){
-  document.getElementById('alertModal').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-function renderRepos(D){
-  const R={};
-  D.forEach(r=>{
-    const n=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-    if(!n) return;
-    if(!R[n]) R[n]={v:0,ok:0,visitas:[]};
-    R[n].v++;
-    if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])) R[n].ok++;
-    R[n].visitas.push(r);
-  });
-
-  document.getElementById('tb2').innerHTML=Object.entries(R).sort((a,b)=>b[1].v-a[1].v).map(([n,d],idx)=>{
-    const p=Math.round(d.ok/d.v*100);
-    const cls=p>=70?'bg':p>=50?'ba':'br';
-
-    // Group visitas by cadena+sucursal, keep latest per sucursal
-    const sucMap={};
-    d.visitas.forEach(r=>{
-      const key=r['Supermercado y Sucursal']||'';
-      if(!sucMap[key]) sucMap[key]={key, r, count:0};
-      sucMap[key].count++;
-    });
-    const sucs=Object.values(sucMap).sort((a,b)=>a.key.localeCompare(b.key));
-    const cadenas=[...new Set(sucs.map(s=>s.key.split('|')[0]).filter(Boolean))];
-
-    const detailId=`repo-detail-${idx}`;
-    const chevronId=`repo-chev-${idx}`;
-
-    const sucItems=sucs.map(s=>{
-      const parts=s.key.split('|');
-      const cadena=parts[0]||'';
-      const suc=parts[1]||parts[0]||'';
-      const repoOk=d.visitas.filter(r=>r['Supermercado y Sucursal']===s.key&&yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])).length;
-      const total=s.count;
-      const pSuc=Math.round(repoOk/total*100);
-      const clsSuc=pSuc>=70?'bg':pSuc>=50?'ba':'br';
-      return `<div class="repo-suc-item">
-        <div class="repo-suc-cadena">${cadena}</div>
-        <div class="repo-suc-name">${suc}</div>
-        <div class="repo-suc-meta">${total} visita${total!==1?'s':''} · <span class="badge ${clsSuc}" style="font-size:10px;padding:1px 6px">${pSuc}%</span></div>
-      </div>`;
-    }).join('');
-
-    return `<tr class="repo-row" onclick="toggleRepo('${detailId}','${chevronId}')">
-      <td class="tn">${n} <span class="repo-chevron" id="${chevronId}">›</span></td>
-      <td>${d.v}</td>
-      <td><span class="badge ${cls}">${p}%</span></td>
-      <td><span class="badge bb">${cadenas.length} cadena${cadenas.length!==1?'s':''}</span></td>
-      <td style="color:var(--t3);font-size:12px">${sucs.length} suc.</td>
-    </tr>
-    <tr class="repo-detail" id="${detailId}">
-      <td colspan="5">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:10px">Sucursales cubiertas</div>
-        <div class="repo-suc-grid">${sucItems}</div>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function toggleRepo(detailId, chevronId){
-  const detail=document.getElementById(detailId);
-  const chev=document.getElementById(chevronId);
-  const isOpen=detail.classList.contains('open');
-  // Close all others
-  document.querySelectorAll('.repo-detail.open').forEach(el=>el.classList.remove('open'));
-  document.querySelectorAll('.repo-chevron.open').forEach(el=>el.classList.remove('open'));
-  // Toggle this one
-  if(!isOpen){
-    detail.classList.add('open');
-    chev.classList.add('open');
-  }
-}
-
-function renderKPIs(D,N,ok,cr,pd,mn,pm){
-  const repoPct=Math.round(ok/N*100);
-  const crPct=Math.round(cr/N*100);
-  const pdPct=Math.round(pd/N*100);
-  const kpis=[
-    {l:'Tasa de reposición completa',v:repoPct+'%',trend:'Formularios con reposición OK',sem:repoPct>=70?'g':repoPct>=50?'a':'r',bar:repoPct},
-    {l:'Crecimiento de espacio',v:crPct+'%',trend:`${cr} visitas con espacio ganado`,sem:crPct>10?'g':crPct>0?'a':'r',bar:crPct},
-    {l:'Pérdida de espacio',v:pdPct+'%',trend:`${pd} visitas con espacio perdido`,sem:pdPct===0?'g':pdPct<10?'a':'r',bar:pdPct},
-    {l:'Exposición a competencia',v:mn,trend:`${mn} ingresos de marcas nuevas`,sem:mn===0?'g':mn<=3?'a':'r',bar:Math.min(mn*10,100)},
-    {l:'Módulos promedio',v:pm.toFixed(1),trend:'Punteras / exhibidores por visita',sem:pm>=3?'g':pm>=2?'a':'r',bar:Math.min(pm/5*100,100)},
-    {l:'Total visitas registradas',v:N,trend:'Formularios en el período',sem:'g',bar:100},
-  ];
-  const colors={g:'#3D5A3E',a:'#8B6914',r:'#8B3A2E'};
-  document.getElementById('kpiGrid').innerHTML=kpis.map(k=>`
-    <div class="kpi-card">
-      <div class="kpi-top"><div class="kpi-label">${k.l}</div><div class="kpi-semaforo ${k.sem}"></div></div>
-      <div class="kpi-value">${k.v}</div>
-      <div class="kpi-trend">${k.trend}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${k.bar}%;background:${colors[k.sem]}"></div></div>
-    </div>`).join('');
-}
-
-function generateInsights(force=false){
-  if(insightsGenerated && !force) return;
-  if(allData.length===0) return;
-
-  const D=allData;
-  const N=D.length;
-  const ok=D.filter(r=>yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])).length;
-  const cr=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci')).length;
-  const pd=D.filter(r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi')).length;
-  const mn=D.filter(r=>yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?'])).length;
-  // Build fragancia ranking for KPI card
-  const fragForKpi = {};
-  D.forEach(r => {
-    const fid = String(r['FORM ID']||'').split('.')[0].trim();
-    (commentsMap[fid]||[]).forEach(c => {
-      parseFragancias(c.comentario).forEach(f => {
-        fragForKpi[f] = (fragForKpi[f]||0) + 1;
-      });
-    });
-  });
-  const topFragKpi = Object.entries(fragForKpi).sort((a,b)=>b[1]-a[1]).slice(0,1);
-  window._topFragKpi = topFragKpi;
-
-  const mds=D.map(r=>parseFloat(r['¿Cuántos módulos / punteras / exhibidor tenemos?']||r['¿Cuantos módulos / punteras / exhibidor tenemos?']||'')).filter(v=>!isNaN(v)&&v>0);
-  const pm=mds.length?(mds.reduce((a,b)=>a+b,0)/mds.length):0;
-  const repoPct=Math.round(ok/N*100);
-  const crPct=Math.round(cr/N*100);
-  const pdPct=Math.round(pd/N*100);
-
-  // Análisis por cadena
-  const C={};
-  D.forEach(r=>{
-    const c=(r['Supermercado y Sucursal']||'').split('|')[0]||'?';
-    const s=(r['Supermercado y Sucursal']||'').split('|')[1]||'';
-    if(!C[c])C[c]={v:0,ok:0,cr:0,pd:0,sucs:new Set()};
-    C[c].v++;C[c].sucs.add(s);
-    if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']))C[c].ok++;
-    if((r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'))C[c].cr++;
-    if((r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi'))C[c].pd++;
-  });
-  const cadenasSorted=Object.entries(C).sort((a,b)=>b[1].v-a[1].v);
-  const topCadena=cadenasSorted[0];
-  const cadenasConPerdida=cadenasSorted.filter(([,d])=>d.pd>0);
-  const peorRepo=cadenasSorted.filter(([,d])=>d.v>=3).sort((a,b)=>(a[1].ok/a[1].v)-(b[1].ok/b[1].v));
-  const mejorRepo=cadenasSorted.filter(([,d])=>d.v>=3).sort((a,b)=>(b[1].ok/b[1].v)-(a[1].ok/a[1].v));
-
-  // Aggregate comments for insights
-  const allComments=[];
-  D.forEach(r=>{const fid=String(r['FORM ID']||'');(commentsMap[fid]||[]).forEach(c=>{if(c.comentario&&c.comentario.length>1)allComments.push({...c,sucursal:r['Supermercado y Sucursal']||''});});});
-  const varFreq={};
-  allComments.forEach(c=>{const k=c.comentario.toLowerCase().trim();varFreq[k]=(varFreq[k]||0)+1;});
-  const topVariants=Object.entries(varFreq).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([v,n])=>`"${v}" (${n}x)`).join(', ');
-  const prodFreq={};
-  allComments.forEach(c=>{if(c.producto)prodFreq[c.producto]=(prodFreq[c.producto]||0)+1;});
-  const topProd=Object.entries(prodFreq).sort((a,b)=>b[1]-a[1])[0];
-
-  // Análisis por repositor
-  const R={};
-  D.forEach(r=>{
-    const n=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-    if(!n)return;
-    if(!R[n])R[n]={v:0,ok:0};
-    R[n].v++;
-    if(yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']))R[n].ok++;
-  });
-  const reposSorted=Object.entries(R).filter(([,d])=>d.v>=3).sort((a,b)=>(b[1].ok/b[1].v)-(a[1].ok/a[1].v));
-
-  // Análisis de mercadería
-  const sinDeposito=D.filter(r=>no(r['¿Quedó mercadería disponible en el depósito?'])).length;
-  const sinIngreso=D.filter(r=>no(r['¿Ingresó mercaderia?'])).length;
-
-  // Meses disponibles
-  const meses=[...new Set(D.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))];
-
-  // Construir el análisis
-  let situacion='';
-  if(repoPct>=75) situacion=`La operación muestra una tasa de reposición sólida del ${repoPct}% sobre ${N} visitas registradas en ${meses.join(' y ')}.`;
-  else if(repoPct>=55) situacion=`La operación presenta una tasa de reposición moderada del ${repoPct}% sobre ${N} visitas en ${meses.join(' y ')}, con margen claro de mejora.`;
-  else situacion=`La operación muestra una tasa de reposición baja del ${repoPct}% sobre ${N} visitas en ${meses.join(' y ')}, lo que requiere atención inmediata.`;
-
-  if(crPct>0&&pdPct===0) situacion+=` El espacio en góndola evolucionó positivamente: crecimos en ${cr} visitas (${crPct}%) sin registrar pérdidas.`;
-  else if(crPct>0&&pdPct>0) situacion+=` El espacio en góndola muestra señales mixtas: ganamos en ${cr} visitas pero perdimos en ${pd} (${pdPct}%).`;
-  else if(pdPct>0) situacion+=` Preocupa la pérdida de espacio registrada en ${pd} visitas (${pdPct}%).`;
-
-  if(topCadena) situacion+=` La cadena con mayor cobertura es ${topCadena[0]} con ${topCadena[1].v} visitas.`;
-  if(topProd) situacion+=` El producto con más reportes de faltante es ${topProd[0]} con ${topProd[1]} menciones en comentarios de repositores.`;
-
-  // Puntos críticos
-  const criticos=[];
-  if(peorRepo.length>0){const [nc,dc]=peorRepo[0];criticos.push(`${nc} es la cadena con peor tasa de reposición completa: ${Math.round(dc.ok/dc.v*100)}% en ${dc.v} visitas. Requiere revisión del proceso de abastecimiento en esa cadena.`);}
-  if(cadenasConPerdida.length>0){const nombres=cadenasConPerdida.map(([n,d])=>`${n} (${d.pd} vez${d.pd>1?'es':''})`).join(', ');criticos.push(`Se registraron pérdidas de espacio en ${cadenasConPerdida.length} cadena${cadenasConPerdida.length>1?'s':''}: ${nombres}. Estas bocas son prioritarias para negociación de espacio.`);}
-  if(sinDeposito>N*0.3) criticos.push(`En el ${Math.round(sinDeposito/N*100)}% de las visitas no había mercadería disponible en el depósito de la tienda. Esto indica un problema de abastecimiento o logística que impacta directamente la reposición.`);
-  if(mn>0) criticos.push(`Se detectaron ${mn} ingreso${mn>1?'s':''} de marcas competidoras en el lineal. Aunque es un número manejable, representa una amenaza concreta al espacio de góndola.`);
-  if(topVariants) criticos.push(`Las variantes más mencionadas como faltantes por los repositores son: ${topVariants}. Esto indica demanda insatisfecha específica que debería priorizarse en el próximo abastecimiento.`);
-  if(criticos.length===0) criticos.push('No se detectaron puntos críticos mayores en el período analizado. La operación se mantiene dentro de parámetros normales.');
-
-  // Oportunidades
-  const opps=[];
-  if(mejorRepo.length>0){const [nm,dm]=mejorRepo[0];opps.push(`${nm} tiene la mejor tasa de reposición (${Math.round(dm.ok/dm.v*100)}%). Analizar sus prácticas y replicarlas en otras cadenas puede mejorar el promedio general.`);}
-  if(pm<2.5) opps.push(`El promedio de módulos/punteras es de ${pm.toFixed(1)} por visita. Hay oportunidad de negociar más espacios de exhibición en las cadenas donde actualmente tenemos menos presencia.`);
-  else opps.push(`Con ${pm.toFixed(1)} módulos promedio por visita, la cobertura es razonable. El foco debería estar en mejorar la calidad de exhibición en los espacios actuales antes de buscar nuevos.`);
-  if(crPct>5) opps.push(`El ${crPct}% de visitas con crecimiento de espacio indica que la estrategia de expansión está funcionando. Identificar qué acciones generaron ese crecimiento para replicarlas.`);
-
-  // Recomendación
-  let reco='';
-  if(cadenasConPerdida.length>0) reco=`Esta semana: visitá personalmente ${cadenasConPerdida[0][0]} y reunite con el encargado de sección para recuperar el espacio perdido. Llevá argumentos de rotación y propuesta de activación en POP.`;
-  else if(peorRepo.length>0&&Math.round(peorRepo[0][1].ok/peorRepo[0][1].v*100)<60) reco=`Esta semana: auditá en detalle las causas de baja reposición en ${peorRepo[0][0]}. Verificar si es problema de stock, de logística o de ejecución del repositor.`;
-  else if(mn>2) reco=`Esta semana: mapeá exactamente en qué sucursales ingresaron marcas nuevas y qué espacio ocupan. Con esa info, armá una propuesta para el equipo comercial antes de que ganen posición.`;
-  else reco=`Esta semana: consolidá un reporte de los ${cr} casos donde crecimos espacio y presentalo internamente como caso de éxito. Usá esos aprendizajes para proponer una iniciativa similar en otras cadenas.`;
-
-  // Armar HTML del análisis
-  const sections=[
-    {title:'1. SITUACIÓN GENERAL',content:situacion,color:'var(--blue)'},
-    {title:'2. PUNTOS CRÍTICOS',content:criticos.map((c,i)=>'• '+c).join('\n\n'),color:'var(--red)'},
-    {title:'3. OPORTUNIDADES DETECTADAS',content:opps.map(o=>'• '+o).join('\n\n'),color:'var(--green)'},
-    {title:'4. RECOMENDACIÓN PRIORITARIA',content:reco,color:'var(--amber)'},
-  ];
-
-  const html=sections.map(s=>`
-    <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--b)">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:${s.color};margin-bottom:8px;text-transform:uppercase">${s.title}</div>
-      <div class="insight-text" style="font-size:14px;line-height:1.8;color:var(--t2);white-space:pre-wrap">${s.content}</div>
-    </div>`).join('');
-
-  document.getElementById('insightText').innerHTML=html;
-  document.getElementById('insightDate').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  insightsGenerated=true;
-}
-
-function renderFotos(){
-  const cadena=document.getElementById('fotosCadena').value;
-  const sucursal=document.getElementById('fotosSucursal').value;
-  const mes=document.getElementById('fotosMes').value;
-
-  // Update sucursal filter based on cadena
-  const sucSel=document.getElementById('fotosSucursal');
-  const currentSuc=sucSel.value;
-  sucSel.innerHTML='<option value="all">Todas las sucursales</option>';
-  const sucs=[...new Set(allData.filter(r=>cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena)).map(r=>(r['Supermercado y Sucursal']||'').split('|')[1]).filter(Boolean))].sort();
-  sucs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===currentSuc)o.selected=true;sucSel.appendChild(o);});
-
-  const filtered=allData.filter(r=>{
-    const cOk=cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
-    const sOk=sucursal==='all'||(r['Supermercado y Sucursal']||'').split('|')[1]===sucursal;
-    const mOk=mes==='all'||(r['Mes']||'').toLowerCase()===mes;
-    return cOk&&sOk&&mOk;
-  }).sort((a,b)=>new Date(b['Fecha respuesta'])-new Date(a['Fecha respuesta']));
-
-  document.getElementById('fotoCount').textContent=`${filtered.length} visitas encontradas`;
-
-  if(filtered.length===0){
-    document.getElementById('fotoGrid').innerHTML='<div class="foto-empty">No hay visitas para los filtros seleccionados.</div>';
-    return;
-  }
-
-  document.getElementById('fotoGrid').innerHTML=filtered.map(r=>{
-    const supursal=(r['Supermercado y Sucursal']||'').split('|');
-    const cadenaName=supursal[0]||'';
-    const sucName=supursal[1]||'';
-    const fecha=r['Fecha respuesta']||'';
-    const imgs=[
-      {url:r['Foto de la góndola completa'],label:'Góndola completa'},
-      {url:r['Foto detalle de OrganicSpa'],label:'Detalle Organic Spa'},
-      {url:r['Góndola pre-reposición foto 1'],label:'Pre-reposición 1'},
-      {url:r['Góndola pre-reposición foto 2'],label:'Pre-reposición 2'},
-      {url:r['Góndola pre-reposición foto 3'],label:'Pre-reposición 3'},
-      {url:r['Góndola pre-reposición foto 4'],label:'Pre-reposición 4'},
-      {url:r['Góndola pre-reposición foto 5'],label:'Pre-reposición 5'},
-      {url:r['Imágen de los 5 infaltables - foto 1'],label:'Infaltables 1'},
-      {url:r['Imágen de los 5 infaltables - foto 2'],label:'Infaltables 2'},
-      {url:r['Imágen de los 5 infaltables - foto 3'],label:'Infaltables 3'},
-      {url:r['Imágen de los 5 infaltables - foto 4'],label:'Infaltables 4'},
-      {url:r['Imágen de los 5 infaltables - foto 5'],label:'Infaltables 5'},
-    ].filter(i=>i.url&&i.url.startsWith('http'));
-
-    if(imgs.length===0) return '';
-
-    const fid = String(r['FORM ID']||'').replace(/'/g,'');
-    return `<div class="foto-card" onclick="openDetail('${fid}')" style="cursor:pointer">
-      <div class="foto-card-header" style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div class="foto-card-title">${cadenaName} — ${sucName}</div>
-          <div class="foto-card-sub">${fecha} · ${r['Nombre']||''} ${r['Apellido']||''}</div>
-        </div>
-        <span style="font-size:11px;background:var(--gbg);color:var(--green);padding:3px 8px;border-radius:20px;font-weight:500;flex-shrink:0;margin-left:8px;white-space:nowrap">${imgs.length} fotos →</span>
-      </div>
-      <div class="foto-imgs">
-        ${imgs.slice(0,6).map(img=>`<div class="foto-img">
-          <img src="${img.url}" alt="${img.label}" loading="lazy" onerror="this.parentElement.style.display='none'">
-          <div class="foto-img-label">${img.label}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-
-  }).filter(Boolean).join('');
-}
-
-function openLightbox(url,label){
-  document.getElementById('lightboxImg').src=url;
-  document.getElementById('lightboxLabel').textContent=label;
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
-
-function openDrilldown(label, D, cadenaFilter){
-  const filterMap={
-    'Crecimos': r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('creci'),
-    'Perdimos': r=>(r['¿Crecimos o perdimos espacio?']||'').toLowerCase().includes('perdi'),
-    'Igual': r=>{const v=(r['¿Crecimos o perdimos espacio?']||'').toLowerCase();return !v.includes('creci')&&!v.includes('perdi');}
-  };
-  const colors={'Crecimos':'#3D5A3E','Perdimos':'#8B3A2E','Igual':'#8B6914'};
-  const bgColors={'Crecimos':'#E8F0E8','Perdimos':'#F5E8E6','Igual':'#F5EDD8'};
-  const sourceData = D || filtered();
-  const rows = label==='all' ? sourceData : sourceData.filter(filterMap[label]||(_=>true));
-  rows.sort((a,b)=>new Date(b['Fecha respuesta'])-new Date(a['Fecha respuesta']));
-  const titleLabel = cadenaFilter ? `${cadenaFilter}` : label;
-  document.getElementById('ddTitle').textContent=`${titleLabel} — ${rows.length} visita${rows.length!==1?'s':''}`;
-  document.getElementById('ddSubtitle').textContent= cadenaFilter ? `Reposición: ${Math.round(rows.filter(r=>yes(r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)'])).length/Math.max(rows.length,1)*100)}% · más reciente primero` : 'Detalle de sucursales · más reciente primero';
-  document.getElementById('ddBody').innerHTML=rows.length===0
-    ?'<div style="text-align:center;padding:40px 0;color:var(--t3);font-size:13px">Sin registros para este segmento</div>'
-    :rows.map(r=>{
-      const parts=(r['Supermercado y Sucursal']||'').split('|');
-      const cadena=parts[0]||'';
-      const suc=parts[1]||parts[0]||'Sin nombre';
-      const fecha=r['Fecha respuesta']||'';
-      const repo=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-      mods=r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—';
-      const marcaNueva=yes(r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']);
-      const fid=String(r['FORM ID']||'');
-      const comments=(commentsMap[fid]||[]).filter(c=>c.comentario&&c.comentario.length>1);
-      const commentsHtml=comments.length>0
-        ?`<div style="margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:6px;font-size:11px;color:var(--t2);line-height:1.7">${comments.map(c=>`<span style="font-weight:600;color:var(--t)">${c.producto}:</span> ${c.comentario}`).join(' · ')}</div>`
-        :'';
-      return `<div class="drilldown-item">
-        <div class="drilldown-cadena">${cadena}</div>
-        <div class="drilldown-sucursal">${suc}</div>
-        <div class="drilldown-meta">${fecha} · ${repo}</div>
-        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
-          <span style="background:${bgColors[label]};color:${colors[label]};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500">${label}</span>
-          <span style="background:var(--s2);color:var(--t2);padding:2px 8px;border-radius:20px;font-size:11px">${mods} módulos</span>
-          ${marcaNueva?'<span style="background:var(--abg);color:var(--amber);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500">Marca nueva</span>':''}
-        </div>
-        ${commentsHtml}
-      </div>`;
-    }).join('');
-  document.getElementById('drilldown').classList.add('open');
-  document.getElementById('ddOverlay').classList.add('open');
-}
-
-function closeDrilldown(){
-  document.getElementById('drilldown').classList.remove('open');
-  document.getElementById('ddOverlay').classList.remove('open');
-}
-
-function openDetail(formId){
-  const r=allData.find(x=>String(x['FORM ID'])===String(formId));
-  if(!r) return;
-  const parts=(r['Supermercado y Sucursal']||'').split('|');
-  const cadena=parts[0]||'';
-  const suc=parts[1]||parts[0]||'';
-  const fecha=r['Fecha respuesta']||'';
-  const repo=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-
-  document.getElementById('detailTitle').textContent=`${cadena} — ${suc}`;
-  document.getElementById('detailMeta').textContent=`${fecha} · ${repo}`;
-
-  // Group photos by section
-  const sections=[
-    {title:'Góndola',fotos:[
-      {url:r['Foto de la góndola completa'],label:'Góndola completa'},
-      {url:r['Foto detalle de OrganicSpa'],label:'Detalle Organic Spa'},
-    ]},
-    {title:'Pre-reposición',fotos:[
-      {url:r['Góndola pre-reposición foto 1'],label:'Pre-reposición 1'},
-      {url:r['Góndola pre-reposición foto 2'],label:'Pre-reposición 2'},
-      {url:r['Góndola pre-reposición foto 3'],label:'Pre-reposición 3'},
-      {url:r['Góndola pre-reposición foto 4'],label:'Pre-reposición 4'},
-      {url:r['Góndola pre-reposición foto 5'],label:'Pre-reposición 5'},
-    ]},
-    {title:'Los 5 infaltables',fotos:[
-      {url:r['Imágen de los 5 infaltables - foto 1'],label:'Infaltable 1'},
-      {url:r['Imágen de los 5 infaltables - foto 2'],label:'Infaltable 2'},
-      {url:r['Imágen de los 5 infaltables - foto 3'],label:'Infaltable 3'},
-      {url:r['Imágen de los 5 infaltables - foto 4'],label:'Infaltable 4'},
-      {url:r['Imágen de los 5 infaltables - foto 5'],label:'Infaltable 5'},
-    ]},
-  ];
-
-  // Data summary
-  const dataRows=[
-    {k:'¿Quedó mercadería en depósito?',v:r['¿Quedó mercadería disponible en el depósito?']},
-    {k:'¿Ingresó mercadería?',v:r['¿Ingresó mercaderia?']},
-    {k:'¿Reposición completa?',v:r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']},
-    {k:'Repuesto difusor',v:r['Repuesto difusor']},
-    {k:'Inciensos',v:r['Inciensos']},
-    {k:'Aromatizador ambientes',v:r['Aromatizador ambientes']},
-    {k:'Difusor Home',v:r['Difusor Home']},
-    {k:'Vela Votiva',v:r['Vela Votiva']},
-    {k:'Módulos / punteras / exhibidores',v:r['¿Cuántos módulos / punteras / exhibidor tenemos?']},
-    {k:'¿Crecimos o perdimos espacio?',v:r['¿Crecimos o perdimos espacio?']},
-    {k:'¿Ingresó marca nueva?',v:r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']},
-    {k:'Tiras impulsivas',v:r['¿Cuantas tiras impulsivas hay en la tienda?']},
-    {k:'¿Armado decoración especial?',v:r['¿Se vio armado de decoración especial?']},
-  ].filter(d=>d.v&&d.v!=='');
-
-  const valColor=v=>{const s=(v||'').toLowerCase().trim();if(s==='sí'||s==='si')return 'color:var(--green)';if(s==='no')return 'color:var(--red)';return '';};
-
-  // Get comments for this form
-  const formComments=(commentsMap[String(formId)]||[]).filter(c=>c.comentario&&c.comentario.length>1);
-  const commentsSection=formComments.length>0
-    ?`<div class="detail-section-title">Comentarios del repositor (${formComments.length})</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-        ${formComments.map(c=>`<div style="background:var(--s2);border-radius:8px;padding:10px 14px;font-size:13px">
-          <div style="font-size:11px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">${c.producto}</div>
-          <div style="color:var(--t2)">${c.comentario}</div>
-          ${c.foto&&c.foto.startsWith('http')?`<img src="${c.foto}" style="width:100%;border-radius:6px;margin-top:8px;cursor:pointer" onclick="openLightbox('${c.foto.replace(/'/g,"\'")}','${c.producto}')" loading="lazy" onerror="this.style.display='none'">`:'' }
-        </div>`).join('')}
-      </div>`
-    :'';
-
-  let html=commentsSection+'<div class="detail-data">'
-    +dataRows.map(d=>`<div class="detail-row"><span class="detail-key">${d.k}</span><span class="detail-val" style="${valColor(d.v)}">${d.v}</span></div>`).join('')
-    +'</div>';
-
-  sections.forEach(sec=>{
-    const validFotos=sec.fotos.filter(f=>f.url&&f.url.startsWith('http'));
-    if(!validFotos.length) return;
-    html+=`<div class="detail-section-title">${sec.title} (${validFotos.length})</div>`;
-    html+=`<div class="detail-grid">${validFotos.map(f=>`
-      <div class="detail-photo" onclick="event.stopPropagation();openLightbox('${f.url.replace(/'/g,"\'")}','${f.label} — ${suc}')">
-        <img src="${f.url}" alt="${f.label}" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="detail-photo-label">${f.label}</div>
-      </div>`).join('')}</div>`;
-  });
-
-  document.getElementById('detailBody').innerHTML=html;
-  document.getElementById('detailView').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
-function closeDetail(){
-  document.getElementById('detailView').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-function renderCompetencia(){
-  const cadena=document.getElementById('compCadena').value;
-  const mes=document.getElementById('compMes').value;
-
+function renderExhibidores(){
   // Populate filters
-  const cc=document.getElementById('compCadena');
-  const cex=[...cc.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
-    .forEach(c=>{if(!cex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
-  const cm=document.getElementById('compMes');
-  const mex=[...cm.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))].sort((a,b)=>Object.keys(MESES_ES).indexOf(a)-Object.keys(MESES_ES).indexOf(b))
-    .forEach(m=>{if(!mex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;cm.appendChild(o);}});
-
-  const data=allData.filter(r=>{
-    const cOk=cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
-    const mOk=mes==='all'||(r['Mes']||'').toLowerCase()===mes;
-    const marcaVal=r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']||'';
-    return cOk&&mOk&&yes(marcaVal);
-  }).sort((a,b)=>new Date(b['Fecha respuesta'])-new Date(a['Fecha respuesta']));
-
-  document.getElementById('compCount').textContent=`${data.length} caso${data.length!==1?'s':''} detectados`;
-
-  if(data.length===0){
-    document.getElementById('compGrid').innerHTML='<div class="comp-empty">No se detectó competencia para los filtros seleccionados.</div>';
-    return;
+  const cc=document.getElementById('exhibCadena');
+  if(cc){
+    const ex=[...cc.options].map(o=>o.value);
+    [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
+      .forEach(c=>{if(!ex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
+  }
+  const cm=document.getElementById('exhibMes');
+  if(cm){
+    const ex=[...cm.options].map(o=>o.value);
+    [...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))]
+      .sort((a,b)=>Object.keys(MESES_ES).indexOf(a)-Object.keys(MESES_ES).indexOf(b))
+      .forEach(m=>{if(!ex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;cm.appendChild(o);}});
   }
 
-  document.getElementById('compGrid').innerHTML=data.map(r=>{
-    const parts=(r['Supermercado y Sucursal']||'').split('|');
-    const cadenaName=parts[0]||'';
-    const sucName=parts[1]||'';
-    const fecha=r['Fecha respuesta']||'';
-    const repo=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-    const fotoUrl=r['Foto de la góndola completa']||r['Foto detalle de OrganicSpa']||'';
-    const mods=r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—';
-    const espacio=r['¿Crecimos o perdimos espacio?']||'—';
-    const espColor=espacio.toLowerCase().includes('perdi')?'color:var(--red)':espacio.toLowerCase().includes('creci')?'color:var(--green)':'color:var(--t2)';
-    const fid2=String(r['FORM ID']||'');
-    const comps=(commentsMap[fid2]||[]).filter(c=>c.comentario&&c.comentario.length>1);
-    const compHtml=comps.length>0
-      ?`<div style="padding:10px 14px;background:var(--s2);border-top:1px solid var(--b);font-size:11px;color:var(--t2);line-height:1.7">${comps.map(c=>`<span style="font-weight:600;color:var(--t)">${c.producto}:</span> ${c.comentario}`).join(' · ')}</div>`
-      :'';
-    return `<div class="comp-card">
-      <div class="comp-card-header">
-        <div class="comp-card-title">${cadenaName} — ${sucName}</div>
-        <div class="comp-card-meta">${fecha} · ${repo}</div>
-        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
-          <span style="font-size:11px;${espColor};font-weight:500">${espacio}</span>
-          <span style="font-size:11px;color:var(--t3)">${mods} módulos</span>
-        </div>
-      </div>
-      ${compHtml}
-      ${fotoUrl&&fotoUrl.startsWith('http')
-        ?`<img class="comp-card-img" src="${fotoUrl}" alt="góndola" loading="lazy" onclick="openLightbox('${fotoUrl.replace(/'/g,"\'")}','${cadenaName} — ${sucName}')" onerror="this.style.display='none'">`
-        :'<div class="comp-card-noimg">Sin foto disponible</div>'}
-    </div>`;
-  }).join('');
-}
+  const cadena=(cc&&cc.value)||'all';
+  const mes=(cm&&cm.value)||'all';
 
-function renderModulos(){
-  const cadena=document.getElementById('modCadena').value;
-  const sucursal=document.getElementById('modSucursal').value;
-
-  // Populate cadena filter
-  const cc=document.getElementById('modCadena');
-  const cex=[...cc.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
-    .forEach(c=>{if(!cex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
-
-  // Populate sucursal filter based on cadena
-  const sc=document.getElementById('modSucursal');
-  const curSuc=sc.value;
-  sc.innerHTML='<option value="all">Todas las sucursales</option>';
-  const sucs=[...new Set(allData.filter(r=>cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena)).map(r=>(r['Supermercado y Sucursal']||'')).filter(Boolean))].sort();
-  sucs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.replace('|',' — ');if(s===curSuc)o.selected=true;sc.appendChild(o);});
-
+  // Filter rows that have an exhibidor photo
   const data=allData.filter(r=>{
-    const cOk=cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
-    const sOk=sucursal==='all'||(r['Supermercado y Sucursal']||'')===sucursal;
-    const modVal=r['¿Cuántos módulos / punteras / exhibidor tenemos?']||r['¿Cuantos módulos / punteras / exhibidor tenemos?']||'';
-    const m=parseFloat(modVal);
-    return cOk&&sOk&&!isNaN(m)&&m>0;
-  }).sort((a,b)=>new Date(a['Fecha respuesta'])-new Date(b['Fecha respuesta']));
-
-  // Group by sucursal for multiple lines
-  const bySuc={};
-  data.forEach(r=>{
-    const key=r['Supermercado y Sucursal']||'?';
-    if(!bySuc[key]) bySuc[key]=[];
-    bySuc[key].push({x:r['Fecha respuesta'],y:parseFloat(r['¿Cuántos módulos / punteras / exhibidor tenemos?'])});
-  });
-
-  const palette=['#3D5A3E','#8B6914','#2B4A6B','#8B3A2E','#7A9E7E','#C4A882','#5A3D5A','#3D5A5A'];
-  const datasets=Object.entries(bySuc).map(([suc,pts],i)=>({
-    label:suc.split('|')[1]||suc.split('|')[0]||suc,
-    data:pts,
-    borderColor:palette[i%palette.length],
-    backgroundColor:palette[i%palette.length]+'33',
-    tension:.3,
-    pointRadius:5,
-    pointHoverRadius:7,
-    fill:false,
-    borderWidth:2,
-  }));
-
-  if(CH.cMod) CH.cMod.destroy();
-  CH.cMod=new Chart(document.getElementById('cMod'),{
-    type:'line',
-    data:{datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:datasets.length<=8,position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}},
-        tooltip:{callbacks:{
-          title:ctx=>ctx[0].raw.x,
-          label:ctx=>`${ctx.dataset.label}: ${ctx.raw.y} módulos`
-        }}
-      },
-      scales:{
-        x:{type:'category',ticks:{font:{size:10},maxRotation:45},grid:{color:'rgba(0,0,0,0.04)'}},
-        y:{title:{display:true,text:'Módulos / punteras',font:{size:11}},min:0,ticks:{stepSize:0.5,font:{size:11}},grid:{color:'rgba(0,0,0,0.04)'}}
-      }
-    }
-  });
-}
-
-function renderQuiebres(){
-  const cadena=document.getElementById('qCadena').value;
-  const mes=document.getElementById('qMes').value;
-
-  // Populate filters
-  const cc=document.getElementById('qCadena');
-  const cex=[...cc.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
-    .forEach(c=>{if(!cex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
-  const cm=document.getElementById('qMes');
-  const mex=[...cm.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))].sort((a,b)=>Object.keys(MESES_ES).indexOf(a)-Object.keys(MESES_ES).indexOf(b))
-    .forEach(m=>{if(!mex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;cm.appendChild(o);}});
-
-  const data=allData.filter(r=>{
-    const cOk=cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
+    const foto=(r['Foto del exhibidor']||'').trim();
+    if(!foto||!foto.startsWith('http')) return false;
+    const cOk=cadena==='all'||(r['Supermercado y Sucursal']||'').split('|')[0]===cadena;
     const mOk=mes==='all'||(r['Mes']||'').toLowerCase()===mes;
     return cOk&&mOk;
-  });
+  }).sort((a,b)=>new Date(b['Fecha respuesta'])-new Date(a['Fecha respuesta']));
 
-  const N=data.length;
-  if(!N) return;
+  const countEl=document.getElementById('exhibCount');
+  if(countEl) countEl.textContent=`${data.length} exhibidor${data.length!==1?'es':''} registrado${data.length!==1?'s':''}`;
 
-  const productos=[
-    {label:'Repuesto difusor',key:'Repuesto difusor',color:'#2B4A6B'},
-    {label:'Inciensos',key:'Inciensos',color:'#3D5A3E'},
-    {label:'Aromatizador ambientes',key:'Aromatizador ambientes',color:'#8B6914'},
-    {label:'Difusor Home',key:'Difusor Home',color:'#5A3D5A'},
-    {label:'Vela Votiva',key:'Vela Votiva',color:'#8B3A2E'},
-  ];
+  const grid=document.getElementById('exhibGrid');
+  if(!grid) return;
 
-  // Cards con % de quiebre por producto (no se pudo reponer = No)
-  document.getElementById('quiebresGrid').innerHTML=productos.map(p=>{
-    const withData=data.filter(r=>r[p.key]!=='');
-    const quebro=withData.filter(r=>no(r[p.key])).length;
-    const total=withData.length;
-    const pct=total>0?Math.round(quebro/total*100):0;
-    const repuso=total-quebro;
-    const cls=pct>=40?'var(--red)':pct>=20?'var(--amber)':'var(--green)';
-    return `<div class="quiebre-card">
-      <div class="quiebre-title">${p.label}</div>
-      <div class="quiebre-pct" style="color:${cls}">${pct}%</div>
-      <div style="font-size:12px;color:var(--t2)">no se pudo reponer</div>
-      <div class="quiebre-bar"><div class="quiebre-bar-fill" style="width:${pct}%;background:${cls}"></div></div>
-      <div class="quiebre-meta">${quebro} quiebres · ${repuso} repuestos · ${total} con datos</div>
-    </div>`;
-  }).join('');
-
-  // Line chart de quiebres en el tiempo por mes
-  const mesesData={};
-  data.forEach(r=>{
-    const m=r['Mes']||'sin mes';
-    if(!mesesData[m]) mesesData[m]={total:0};
-    productos.forEach(p=>{if(!mesesData[m][p.key])mesesData[m][p.key]={q:0,t:0};});
-    mesesData[m].total++;
-    productos.forEach(p=>{
-      if(r[p.key]!==''){
-        mesesData[m][p.key].t++;
-        if(no(r[p.key])) mesesData[m][p.key].q++;
-      }
-    });
-  });
-
-  const ordenMeses=Object.keys(MESES_ES);
-  const labels=Object.keys(mesesData).sort((a,b)=>ordenMeses.indexOf(a)-ordenMeses.indexOf(b));
-
-  const datasets=productos.map(p=>({
-    label:p.label,
-    data:labels.map(m=>{
-      const d=mesesData[m][p.key]||{q:0,t:0};
-      return d.t>0?Math.round(d.q/d.t*100):0;
-    }),
-    borderColor:p.color,
-    backgroundColor:p.color+'22',
-    tension:.3,
-    pointRadius:5,
-    pointHoverRadius:7,
-    borderWidth:2,
-    fill:false,
-  }));
-
-  // ── Fragancia ranking ────────────────────────────────────────────────────
-  const fragStats = window.fraganciaStats || {};
-  const fragFiltered = {}; // recount filtered to current selection
-  data.forEach(r => {
-    const fid = String(r['FORM ID']||'').split('.')[0].trim();
-    (commentsMap[fid]||[]).forEach(c => {
-      parseFragancias(c.comentario).forEach(f => {
-        if(!fragFiltered[f]) fragFiltered[f] = { count:0, sucursales:new Set() };
-        fragFiltered[f].count++;
-        fragFiltered[f].sucursales.add(r['Supermercado y Sucursal']||'');
-      });
-    });
-  });
-
-  const fragSorted = Object.entries(fragFiltered).sort((a,b)=>b[1].count-a[1].count);
-  const maxFragCount = fragSorted.length ? fragSorted[0][1].count : 1;
-
-  const fragEl = document.getElementById('fragRankingList');
-  if(fragEl) {
-    if(fragSorted.length === 0) {
-      fragEl.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:20px">Sin datos suficientes con los filtros actuales</div>';
-    } else {
-      fragEl.innerHTML = fragSorted.slice(0,10).map(([f,d]) => {
-        const pct = Math.round(d.count / maxFragCount * 100);
-        const color = d.count >= 5 ? 'var(--red)' : d.count >= 3 ? 'var(--amber)' : 'var(--green)';
-        return `<div style="margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <span style="font-size:12px;font-weight:600;color:var(--t)">${f}</span>
-            <span style="font-size:11px;color:${color};font-weight:600">${d.count} reporte${d.count!==1?'s':''} · ${d.sucursales.size} suc.</span>
-          </div>
-          <div style="height:7px;background:var(--s2);border-radius:4px;overflow:hidden">
-            <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width .4s"></div>
-          </div>
-        </div>`;
-      }).join('');
-    }
+  if(!data.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--t3);font-size:13px">No hay fotos de exhibidores para los filtros seleccionados.<br><span style="font-size:11px;margin-top:6px;display:block">Las fotos de exhibidores se cargan cuando los repositores responden la pregunta correspondiente en el formulario.</span></div>';
+    return;
   }
 
-  // ── Stock critico (filtrado) ──────────────────────────────────────────────
-  const stockFilt = (window.stockCritico||[]).filter(sc => {
-    const cOk = cadena==='all' || sc.cadena===cadena;
-    const mOk = mes==='all'; // stockCritico no tiene mes directo, skip
-    return cOk;
-  }).sort((a,b)=>a.unidades-b.unidades);
-
-  const stockEl = document.getElementById('stockCriticoList');
-  const stockCountEl = document.getElementById('stockCriticoCount');
-  if(stockCountEl) stockCountEl.textContent = stockFilt.length > 0 ? `(${stockFilt.length} casos)` : '';
-
-  if(stockEl) {
-    if(stockFilt.length === 0) {
-      stockEl.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:20px">Sin stock critico en el periodo seleccionado</div>';
-    } else {
-      stockEl.innerHTML = stockFilt.slice(0,25).map(sc => {
-        const badge = sc.unidades === 0
-          ? `<span style="background:var(--rbg);color:var(--red);padding:2px 7px;border-radius:12px;font-size:10px;font-weight:700">SIN STOCK</span>`
-          : `<span style="background:var(--abg);color:var(--amber);padding:2px 7px;border-radius:12px;font-size:10px;font-weight:700">${sc.unidades} u.</span>`;
-        return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--b)">
-          ${badge}
-          <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:600;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sc.cadena} - ${sc.sucursal}</div>
-            <div style="font-size:10px;color:var(--t3)">${sc.fragancia} · ${sc.producto}</div>
-          </div>
-          <div style="font-size:10px;color:var(--t3);white-space:nowrap">${sc.fecha}</div>
-        </div>`;
-      }).join('');
-    }
-  }
-
-  if(CH.cQuiebres) CH.cQuiebres.destroy();
-  CH.cQuiebres=new Chart(document.getElementById('cQuiebres'),{
-    type:'line',
-    data:{labels,datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}},
-        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw}% quiebre`}}
-      },
-      scales:{
-        x:{ticks:{font:{size:11}},grid:{color:'rgba(0,0,0,0.04)'}},
-        y:{min:0,max:100,title:{display:true,text:'% quiebre',font:{size:11}},ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(0,0,0,0.04)'}}
-      }
-    }
-  });
-}
-
-function renderVisitas(){
-  // Populate filters
-  const cc=document.getElementById('visitasCadena');
-  const cex=[...cc.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
-    .forEach(c=>{if(!cex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
-
-  const cm=document.getElementById('visitasMes');
-  const mex=[...cm.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))]
-    .sort((a,b)=>Object.keys(MESES_ES).indexOf(a)-Object.keys(MESES_ES).indexOf(b))
-    .forEach(m=>{if(!mex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;cm.appendChild(o);}});
-
-  const cr=document.getElementById('visitasRepo');
-  const rex=[...cr.options].map(o=>o.value);
-  [...new Set(allData.map(r=>`${r['Nombre']||''} ${r['Apellido']||''}`.trim()).filter(Boolean))].sort()
-    .forEach(n=>{if(!rex.includes(n)){const o=document.createElement('option');o.value=n;o.textContent=n;cr.appendChild(o);}});
-
-  const cadena=cc.value;
-  const mes=cm.value;
-  const repo=cr.value;
-
-  const data=allData.filter(r=>{
-    const cOk=cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
-    const mOk=mes==='all'||(r['Mes']||'').toLowerCase()===mes;
-    const rOk=repo==='all'||`${r['Nombre']||''} ${r['Apellido']||''}`.trim()===repo;
-    return cOk&&mOk&&rOk;
-  }).sort((a,b)=>new Date(b['Fecha respuesta'])-new Date(a['Fecha respuesta'])).slice(0,200);
-
-  document.getElementById('visitasCount').textContent=`${data.length} visitas (más recientes primero)`;
-
-  const espColor=v=>{
-    const s=(v||'').toLowerCase();
-    if(s.includes('creci')) return 'bg';
-    if(s.includes('perdi')) return 'br';
-    return 'bgr';
-  };
-  const repoColor=v=>yes(v)?'bg':no(v)?'br':'bgr';
-  const marcaColor=v=>yes(v)?'ba':'bgr';
-
-  document.getElementById('visitasBody').innerHTML=data.map(r=>{
+  grid.innerHTML=data.map(r=>{
     const parts=(r['Supermercado y Sucursal']||'').split('|');
     const cadenaName=parts[0]||'';
     const sucName=parts[1]||parts[0]||'';
-    const repoName=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-    const espacio=r['¿Crecimos o perdimos espacio?']||'—';
-    const reposicion=r['¿Pudo reponer todos los productos? (Es decir si hay faltantes)']||'—';
-    const marcaNueva=r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']||'—';
-    const mods=r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—';
+    const repo=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
+    const fecha=r['Fecha respuesta']||'';
+    const foto=r['Foto del exhibidor']||'';
+    const comentario=(r['Comentario']||'').trim();
     const fid=String(r['FORM ID']||'');
-    const comments=(commentsMap[fid]||[]).filter(c=>c.comentario&&c.comentario.length>2&&!['si','no','sí'].includes(c.comentario.toLowerCase().trim()));
-
-    return `<tr onclick="openDetail('${fid}')">
-      <td style="white-space:nowrap;font-size:12px;color:var(--t3);font-family:'DM Mono',monospace">${r['Fecha respuesta']||''}</td>
-      <td>
-        <div class="visit-cadena">${cadenaName}</div>
-        <div class="visit-suc">${sucName}</div>
-      </td>
-      <td style="font-size:13px;color:var(--t2)">${repoName}</td>
-      <td><span class="visit-badge ${espColor(espacio)}">${espacio}</span></td>
-      <td><span class="visit-badge ${repoColor(reposicion)}">${yes(reposicion)?'Completa':no(reposicion)?'Incompleta':'—'}</span></td>
-      <td style="font-size:13px;font-family:'DM Mono',monospace;color:var(--t2)">${mods}</td>
-      <td><span class="visit-badge ${marcaColor(marcaNueva)}">${yes(marcaNueva)?'Sí':'No'}</span></td>
-      <td class="visit-comments">${comments.map(c=>`<span style="color:var(--acc);font-weight:600">${c.producto}:</span> ${c.comentario}`).join(' · ')||'<span style="color:var(--t3)">Sin comentarios</span>'}</td>
-    </tr>`;
+    return `<div class="exhib-card" onclick="openLightbox('${foto.replace(/'/g,"\'")}','Exhibidor — ${sucName} — ${fecha}')">
+      <div class="exhib-card-header">
+        <div class="exhib-card-title">${cadenaName} — ${sucName}</div>
+        <div class="exhib-card-meta">${fecha} · ${repo}</div>
+      </div>
+      <img class="exhib-photo" src="${foto}" alt="Exhibidor" loading="lazy" onerror="this.parentElement.querySelector('.exhib-noimg')&&this.style.display='none'">
+      ${comentario?`<div class="exhib-comment">💬 ${comentario}</div>`:''}
+    </div>`;
   }).join('');
 }
 
-// ─── REPORTS DATA ──────────────────────────────────────────────────────────
-let currentReportType = 'visitas';
 
-const REPORT_TYPES = [
-  {
-    id: 'visitas',
-    icon: '☰',
-    title: 'Visitas completas',
-    desc: 'Todas las visitas con datos de reposicion, espacio, modulos y repositor.',
-    cols: ['Fecha','Mes','Cadena','Sucursal','Repositor','Espacio','Reposicion OK','Modulos','Marca nueva','Mercaderia deposito'],
-    fn: (D) => D.map(r => {
-      const p = (r['Supermercado y Sucursal']||'').split('|');
-      return {
-        Fecha: r['Fecha respuesta']||'',
-        Mes: r['Mes']||'',
-        Cadena: p[0]||'',
-        Sucursal: p[1]||p[0]||'',
-        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-        'Espacio': r['\u00bfCrecimos o perdimos espacio?']||'',
-        'Reposicion OK': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
-        Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
-        'Marca nueva': r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?']||'',
-        'Mercaderia deposito': r['\u00bfQued\u00f3 mercader\u00eda disponible en el dep\u00f3sito?']||''
-      };
-    })
-  },
-  {
-    id: 'reposicion',
-    icon: '◎',
-    title: 'Reposicion por producto',
-    desc: 'Estado de reposicion de cada SKU (difusor, inciensos, aromatizador, difusor home, vela votiva) por visita.',
-    cols: ['Fecha','Cadena','Sucursal','Repositor','Repuesto difusor','Inciensos','Arom. ambientes','Difusor Home','Vela Votiva','Reposicion OK','Comentarios'],
-    fn: (D) => D.map(r => {
-      const p = (r['Supermercado y Sucursal']||'').split('|');
-      const fid = String(r['FORM ID']||'');
-      const coms = (commentsMap[fid]||[]).filter(c=>c.comentario&&c.comentario.length>1).map(c=>`${c.producto}: ${c.comentario}`).join(' | ');
-      return {
-        Fecha: r['Fecha respuesta']||'',
-        Cadena: p[0]||'',
-        Sucursal: p[1]||p[0]||'',
-        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-        'Repuesto difusor': r['Repuesto difusor']||'',
-        'Inciensos': r['Inciensos']||'',
-        'Arom. ambientes': r['Aromatizador ambientes']||'',
-        'Difusor Home': r['Difusor Home']||'',
-        'Vela Votiva': r['Vela Votiva']||'',
-        'Reposicion OK': r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)']||'',
-        'Comentarios repositor': coms
-      };
-    })
-  },
-  {
-    id: 'quiebres',
-    icon: '◻',
-    title: 'Quiebres detallados',
-    desc: 'Solo las visitas donde hubo al menos un producto sin reponer, con comentario del repositor.',
-    cols: ['Fecha','Cadena','Sucursal','Repositor','Producto faltante','Comentario','Espacio','Modulos'],
-    fn: (D) => {
-      const rows = [];
-      D.forEach(r => {
-        if(!no(r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)'])) return;
-        const p = (r['Supermercado y Sucursal']||'').split('|');
-        const fid = String(r['FORM ID']||'');
-        const coms = commentsMap[fid]||[];
-        if(coms.length === 0) {
-          rows.push({
-            Fecha: r['Fecha respuesta']||'',
-            Cadena: p[0]||'',
-            Sucursal: p[1]||p[0]||'',
-            Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-            'Producto faltante': '—',
-            Comentario: '(sin comentario)',
-            Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
-            Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||''
-          });
-        } else {
-          coms.forEach(c => {
-            rows.push({
-              Fecha: r['Fecha respuesta']||'',
-              Cadena: p[0]||'',
-              Sucursal: p[1]||p[0]||'',
-              Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-              'Producto faltante': c.producto||'',
-              Comentario: c.comentario||'',
-              Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
-              Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||''
-            });
-          });
-        }
-      });
-      return rows;
-    }
-  },
-  {
-    id: 'espacio',
-    icon: '◈',
-    title: 'Evolucion de espacio',
-    desc: 'Resumen de ganadas y perdidas de espacio en gondola por cadena y sucursal.',
-    cols: ['Fecha','Cadena','Sucursal','Repositor','Espacio','Modulos','Tiras impulsivas','Decoracion especial'],
-    fn: (D) => D.map(r => {
-      const p = (r['Supermercado y Sucursal']||'').split('|');
-      return {
-        Fecha: r['Fecha respuesta']||'',
-        Cadena: p[0]||'',
-        Sucursal: p[1]||p[0]||'',
-        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-        Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
-        Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
-        'Tiras impulsivas': r['Tiras impulsivas']||'',
-        'Decoracion especial': r['Decoraci\u00f3n especial']||''
-      };
-    })
-  },
-  {
-    id: 'competencia',
-    icon: '⚑',
-    title: 'Competencia detectada',
-    desc: 'Solo visitas donde ingreso una marca nueva (Spirit, Aromanza o Sagrada Madre).',
-    cols: ['Fecha','Cadena','Sucursal','Repositor','Espacio','Modulos','Comentarios repositor'],
-    fn: (D) => D.filter(r=>yes(r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?'])).map(r => {
-      const p = (r['Supermercado y Sucursal']||'').split('|');
-      const fid = String(r['FORM ID']||'');
-      const coms = (commentsMap[fid]||[]).filter(c=>c.comentario&&c.comentario.length>1).map(c=>`${c.producto}: ${c.comentario}`).join(' | ');
-      return {
-        Fecha: r['Fecha respuesta']||'',
-        Cadena: p[0]||'',
-        Sucursal: p[1]||p[0]||'',
-        Repositor: `${r['Nombre']||''} ${r['Apellido']||''}`.trim(),
-        Espacio: r['\u00bfCrecimos o perdimos espacio?']||'',
-        Modulos: r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'',
-        'Comentarios repositor': coms
-      };
-    })
-  },
-  {
-    id: 'fragancias',
-    icon: '◈',
-    title: 'Fragancias faltantes',
-    desc: 'Ranking de fragancias reportadas como faltantes en comentarios de repositores, con conteo, sucursales afectadas y casos de stock critico.',
-    cols: ['Fragancia','Reportes','Sucursales distintas','Casos sin stock','Casos stock 1-2u','% del total'],
-    fn: (D) => {
-      const fragD = {};
-      D.forEach(r => {
-        const fid = String(r['FORM ID']||'').split('.')[0].trim();
-        (commentsMap[fid]||[]).forEach(c => {
-          parseFragancias(c.comentario).forEach(f => {
-            if(!fragD[f]) fragD[f] = { count:0, sucs:new Set(), cero:0, bajo:0 };
-            fragD[f].count++;
-            fragD[f].sucs.add(r['Supermercado y Sucursal']||'');
-            const units = parseUnidades(c.comentario);
-            if(units===0) fragD[f].cero++;
-            else if(units!==null && units<=2) fragD[f].bajo++;
-          });
-        });
-      });
-      const total = Object.values(fragD).reduce((s,v)=>s+v.count,0)||1;
-      return Object.entries(fragD).sort((a,b)=>b[1].count-a[1].count).map(([f,d])=>({
-        Fragancia: f,
-        Reportes: d.count,
-        'Sucursales distintas': d.sucs.size,
-        'Casos sin stock': d.cero,
-        'Casos stock 1-2u': d.bajo,
-        '% del total': Math.round(d.count/total*100)+'%'
-      }));
-    }
-  },
-  {
-    id: 'resumen',
-    icon: '◉',
-    title: 'Resumen ejecutivo por cadena',
-    desc: 'KPIs agregados por cadena: visitas, tasa de reposicion, modulos promedio, presencia de competencia.',
-    cols: ['Cadena','Total visitas','Repos. OK','% Repos OK','Crecimos','Perdimos','Mod. prom.','Con marca nueva','Sin mercaderia deposito'],
-    fn: (D) => {
-      const byChain = {};
-      D.forEach(r => {
-        const c = (r['Supermercado y Sucursal']||'').split('|')[0]||'?';
-        if(!byChain[c]) byChain[c]={v:0,ok:0,cr:0,pd:0,mods:[],mn:0,sinMerc:0};
-        byChain[c].v++;
-        if(yes(r['\u00bfPudo reponer todos los productos? (Es decir si hay faltantes)'])) byChain[c].ok++;
-        if((r['\u00bfCrecimos o perdimos espacio?']||'').toLowerCase().includes('creci')) byChain[c].cr++;
-        if((r['\u00bfCrecimos o perdimos espacio?']||'').toLowerCase().includes('perdi')) byChain[c].pd++;
-        const m=parseFloat(r['\u00bfCu\u00e1ntos m\u00f3dulos / punteras / exhibidor tenemos?']||'');
-        if(!isNaN(m)&&m>0) byChain[c].mods.push(m);
-        if(yes(r['\u00bfIngres\u00f3 alguna marca nueva adem\u00e1s de Spirit, Aromanza y Sagrada Madre?'])) byChain[c].mn++;
-        if(no(r['\u00bfQued\u00f3 mercader\u00eda disponible en el dep\u00f3sito?'])) byChain[c].sinMerc++;
-      });
-      return Object.entries(byChain).sort((a,b)=>b[1].v-a[1].v).map(([c,d])=>({
-        Cadena: c,
-        'Total visitas': d.v,
-        'Repos. OK': d.ok,
-        '% Repos OK': d.v>0?Math.round(d.ok/d.v*100)+'%':'—',
-        Crecimos: d.cr,
-        Perdimos: d.pd,
-        'Mod. prom.': d.mods.length>0?(d.mods.reduce((a,b)=>a+b,0)/d.mods.length).toFixed(1):'—',
-        'Con marca nueva': d.mn,
-        'Sin mercaderia deposito': d.sinMerc
-      }));
-    }
+function toggleSidebar(){
+  const sb = document.getElementById('mainSidebar');
+  const btn = document.getElementById('sidebarToggle');
+  const main = document.querySelector('.main');
+  const collapsed = sb.classList.toggle('collapsed');
+  if(collapsed){
+    main.style.marginLeft = '0';
+    btn.style.left = '4px';
+    btn.textContent = '☰';
+    btn.classList.remove('sidebar-open');
+  } else {
+    main.style.marginLeft = '220px';
+    btn.style.left = '220px';
+    btn.textContent = '✕';
+    btn.classList.add('sidebar-open');
   }
-];
-
-function getRepData() {
-  const cadena = document.getElementById('repCadena')?.value || 'all';
-  const mes = document.getElementById('repMes')?.value || 'all';
-  const repo = document.getElementById('repRepo')?.value || 'all';
-  const espacio = document.getElementById('repEspacio')?.value || 'all';
-
-  return allData.filter(r => {
-    const cOk = cadena==='all'||(r['Supermercado y Sucursal']||'').startsWith(cadena);
-    const mOk = mes==='all'||(r['Mes']||'').toLowerCase()===mes;
-    const rOk = repo==='all'||`${r['Nombre']||''} ${r['Apellido']||''}`.trim()===repo;
-    const esp = (r['\u00bfCrecimos o perdimos espacio?']||'').toLowerCase();
-    const eOk = espacio==='all'||(espacio==='creci'&&esp.includes('creci'))||(espacio==='perdi'&&esp.includes('perdi'))||(espacio==='igual'&&!esp.includes('creci')&&!esp.includes('perdi')&&esp!=='');
-    return cOk&&mOk&&rOk&&eOk;
-  });
+  // Resize charts after transition
+  setTimeout(()=>{ Object.values(CH).forEach(c=>{ if(c&&c.resize) c.resize(); }); }, 280);
 }
 
-function renderReporte() {
-  // Populate filters
-  const cc = document.getElementById('repCadena');
-  const cex = [...cc.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Supermercado y Sucursal']||'').split('|')[0]).filter(Boolean))].sort()
-    .forEach(c=>{if(!cex.includes(c)){const o=document.createElement('option');o.value=c;o.textContent=c;cc.appendChild(o);}});
-
-  const cm = document.getElementById('repMes');
-  const mex = [...cm.options].map(o=>o.value);
-  [...new Set(allData.map(r=>(r['Mes']||'').toLowerCase()).filter(Boolean))]
-    .sort((a,b)=>Object.keys(MESES_ES).indexOf(a)-Object.keys(MESES_ES).indexOf(b))
-    .forEach(m=>{if(!mex.includes(m)){const o=document.createElement('option');o.value=m;o.textContent=MESES_ES[m]||m;cm.appendChild(o);}});
-
-  const cr = document.getElementById('repRepo');
-  const rex = [...cr.options].map(o=>o.value);
-  [...new Set(allData.map(r=>`${r['Nombre']||''} ${r['Apellido']||''}`.trim()).filter(Boolean))].sort()
-    .forEach(n=>{if(!rex.includes(n)){const o=document.createElement('option');o.value=n;o.textContent=n;cr.appendChild(o);}});
-
-  // Render type cards
-  const cardsEl = document.getElementById('repCards');
-  if(cardsEl) {
-    cardsEl.innerHTML = REPORT_TYPES.map(rt=>`
-      <div class="rep-card${rt.id===currentReportType?' selected':''}" onclick="selectReport('${rt.id}')">
-        <div class="rep-card-icon">${rt.icon}</div>
-        <div class="rep-card-title">${rt.title}</div>
-        <div class="rep-card-desc">${rt.desc}</div>
-      </div>`).join('');
-  }
-
-  // Render table
-  const D = getRepData();
-  const rt = REPORT_TYPES.find(r=>r.id===currentReportType);
-  if(!rt) return;
-
-  const rows = rt.fn(D);
-  document.getElementById('repPreviewTitle').textContent = rt.title;
-  document.getElementById('repPreviewCount').textContent = `${rows.length} registro${rows.length!==1?'s':''} · Vista previa primeras 50 filas`;
-
-  const thead = document.getElementById('repThead');
-  const tbody = document.getElementById('repTbody');
-
-  if(rows.length===0) {
-    thead.innerHTML='';
-    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--t3)">Sin datos para los filtros seleccionados.</td></tr>`;
-    return;
-  }
-
-  const cols = rt.cols;
-  thead.innerHTML = `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
-  tbody.innerHTML = rows.slice(0,50).map(row=>`<tr>${cols.map(c=>{
-    const v = row[c]||'';
-    const isOk = ['Si','Sí','si','sí'].includes(v);
-    const isNo = ['No','no'].includes(v);
-    const isCreci = v.toLowerCase().includes('creci');
-    const isPerdi = v.toLowerCase().includes('perdi');
-    let style = '';
-    if(isOk||isCreci) style='color:var(--green);font-weight:500';
-    else if(isNo||isPerdi) style='color:var(--red);font-weight:500';
-    return `<td style="${style}" title="${v}">${v}</td>`;
-  }).join('')}</tr>`).join('');
-}
-
-function selectReport(id) {
-  currentReportType = id;
-  renderReporte();
-}
-
-function descargarReporte() {
-  if(typeof XLSX === 'undefined') { alert('Cargando libreria Excel, intenta en un momento...'); return; }
-  const D = getRepData();
-  const rt = REPORT_TYPES.find(r=>r.id===currentReportType);
-  if(!rt) return;
-
-  const rows = rt.fn(D);
-  if(rows.length===0) { alert('No hay datos para descargar con los filtros actuales.'); return; }
-
-  const wb = XLSX.utils.book_new();
-
-  // Main sheet
-  const ws = XLSX.utils.json_to_sheet(rows, { header: rt.cols });
-  // Style header row width
-  const colWidths = rt.cols.map(c=>({ wch: Math.max(c.length+2, 14) }));
-  ws['!cols'] = colWidths;
-  XLSX.utils.book_append_sheet(wb, ws, rt.title.substring(0,31));
-
-  // Summary sheet (always include)
-  if(rt.id !== 'resumen') {
-    const resumenRt = REPORT_TYPES.find(r=>r.id==='resumen');
-    const resRows = resumenRt.fn(D);
-    if(resRows.length > 0) {
-      const wsRes = XLSX.utils.json_to_sheet(resRows, { header: resumenRt.cols });
-      wsRes['!cols'] = resumenRt.cols.map(c=>({ wch: Math.max(c.length+2, 12) }));
-      XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen por cadena');
-    }
-  }
-
-  // Metadata sheet
-  const filtros = {
-    Cadena: document.getElementById('repCadena')?.value||'all',
-    Mes: document.getElementById('repMes')?.value||'all',
-    Repositor: document.getElementById('repRepo')?.value||'all',
-    Espacio: document.getElementById('repEspacio')?.value||'all',
-  };
-  const meta = [
-    { Campo: 'Reporte', Valor: rt.title },
-    { Campo: 'Total registros', Valor: rows.length },
-    { Campo: 'Filtro Cadena', Valor: filtros.Cadena==='all'?'Todas':filtros.Cadena },
-    { Campo: 'Filtro Mes', Valor: filtros.Mes==='all'?'Todos':(MESES_ES[filtros.Mes]||filtros.Mes) },
-    { Campo: 'Filtro Repositor', Valor: filtros.Repositor==='all'?'Todos':filtros.Repositor },
-    { Campo: 'Filtro Espacio', Valor: filtros.Espacio==='all'?'Todos':filtros.Espacio },
-    { Campo: 'Generado', Valor: new Date().toLocaleString('es-AR') },
-    { Campo: 'Fuente', Valor: 'Organic Spa Trade Dashboard' },
-  ];
-  const wsMeta = XLSX.utils.json_to_sheet(meta, { header: ['Campo','Valor'] });
-  wsMeta['!cols'] = [{ wch: 22 }, { wch: 35 }];
-  XLSX.utils.book_append_sheet(wb, wsMeta, 'Metadata');
-
-  // Filename
-  const fecha = new Date().toISOString().slice(0,10);
-  const cadenaSlug = (filtros.Cadena==='all'?'todas':filtros.Cadena).replace(/\s/g,'_').toLowerCase();
-  const mesSlug = filtros.Mes==='all'?'todos_meses':filtros.Mes;
-  const filename = `OS_${rt.id}_${cadenaSlug}_${mesSlug}_${fecha}.xlsx`;
-
-  XLSX.writeFile(wb, filename);
-}
 
 function switchView(v,btn){
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
@@ -4647,12 +2255,12 @@ function switchView(v,btn){
   document.getElementById('view-'+v).classList.add('active');
   btn.classList.add('active');
   if(v==='fotos') renderFotos();
-  if(v==='insights'&&!insightsGenerated&&allData.length>0) generateInsights(false);
   if(v==='competencia') renderCompetencia();
   if(v==='modulos') renderModulos();
   if(v==='quiebres') renderQuiebres();
   if(v==='visitas') renderVisitas();
   if(v==='reportes') renderReporte();
+  if(v==='exhibidores') renderExhibidores();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeDetail();closeAlertModal();}});
 
