@@ -631,7 +631,7 @@ tbody tr:hover td{background:var(--s2)}
 </div>
 
 <script>
-const SID = '1U6YMhvEEgM6O1DwLDO4Kvh0NLFeEuPl1T0T6r5-gOco';
+const SID = '1yj-a5llOvBPNQxsNah3-a22ZpukCfjwEu7UeuhfLno8';
 const SNAME = 'Consolidado';
 let allData = [], CH = {}, insightsGenerated = false;
 
@@ -712,44 +712,23 @@ async function loadSheet(sheetName){
 async function loadData(){
   insightsGenerated=false; // reset so insights refresh with new data
   try{
-    // Load both sheets in parallel
-    const [mainRows, commentRows] = await Promise.all([
-      loadSheet(SNAME),
-      loadSheet('Media&Comments-FormularioReposicinOr-633952')
-    ]);
+    // Cargar solo el sheet principal (comentarios ahora están inline)
+    const mainRows = await loadSheet(SNAME);
 
     allData=mainRows.filter(r=>r['FORM ID']&&r['FORM ID']!=='');
     if(allData.length===0) throw new Error('Sin filas válidas');
 
-    // Build comments map: formId -> array of {producto, comentario, foto}
+    // Build comments map from inline Comentario column
     commentsMap={};
-    commentRows.forEach(r=>{
-      // Try all possible ID column names, normalize to string integer
-      const rawFid=r['Código Formulario']||r['Codigo Formulario']||r['FORM ID']||r['Form ID']||r['form_id']||'';
-      const fid=String(rawFid).split('.')[0].trim(); // remove decimals like "309.0"
+    allData.forEach(r=>{
+      const fid=String(r['FORM ID']||'').split('.')[0].trim();
       if(!fid||fid==='') return;
-      if(!commentsMap[fid]) commentsMap[fid]=[];
-      // Try all possible question/product column names
-      const pregunta=r['Nombre Pregunta']||r['Nombre pregunta']||r['nombre_pregunta']||'';
-      // Extract product from question text
-      const producto=pregunta
-        .replace(/¿De lo que faltó,?\s*/i,'')
-        .replace(/De lo que faltó,?\s*/i,'')
-        .replace(/¿De lo que falto,?\s*/i,'')
-        .trim();
-      const comentario=r['Comentario']||r['comentario']||r['Comment']||'';
-      const foto=r['Foto']||r['foto']||r['Photo']||'';
-      if(producto||comentario){
-        commentsMap[fid].push({
-          producto,
-          comentario:comentario.trim(),
-          foto:foto.trim(),
-          respuesta:r['Respuesta Seleccionada']||r['Respuesta']||''
-        });
+      const comentario=(r['Comentario']||'').trim();
+      if(comentario){
+        commentsMap[fid]=[{producto:'',comentario,foto:'',respuesta:''}];
       }
     });
-    console.log('Comments loaded:',Object.keys(commentsMap).length,'forms with comments');
-    console.log('Sample comment keys:',Object.keys(commentsMap).slice(0,5));
+    console.log('Comments loaded:',Object.keys(commentsMap).length,'forms con comentario');
 
     // ── PARSE COMMENTS: extract fragancias + units from free text ──────────
     
@@ -1427,18 +1406,13 @@ function renderFotos(){
     const sucName=supursal[1]||'';
     const fecha=r['Fecha respuesta']||'';
     const imgs=[
-      {url:r['Foto de la góndola completa'],label:'Góndola completa'},
-      {url:r['Foto detalle de OrganicSpa'],label:'Detalle Organic Spa'},
-      {url:r['Góndola pre-reposición foto 1'],label:'Pre-reposición 1'},
-      {url:r['Góndola pre-reposición foto 2'],label:'Pre-reposición 2'},
-      {url:r['Góndola pre-reposición foto 3'],label:'Pre-reposición 3'},
-      {url:r['Góndola pre-reposición foto 4'],label:'Pre-reposición 4'},
-      {url:r['Góndola pre-reposición foto 5'],label:'Pre-reposición 5'},
-      {url:r['Imágen de los 5 infaltables - foto 1'],label:'Infaltables 1'},
-      {url:r['Imágen de los 5 infaltables - foto 2'],label:'Infaltables 2'},
-      {url:r['Imágen de los 5 infaltables - foto 3'],label:'Infaltables 3'},
-      {url:r['Imágen de los 5 infaltables - foto 4'],label:'Infaltables 4'},
-      {url:r['Imágen de los 5 infaltables - foto 5'],label:'Infaltables 5'},
+      ...Array.from({length:10},(_,i)=>({url:r[`Foto de la góndola completa ${i+1}`],label:`Góndola ${i+1}`})),
+      ...Array.from({length:9}, (_,i)=>({url:r[`Foto detalle de OrganicSpa ${i+1}`],label:`Detalle OS ${i+1}`})),
+      {url:r['Góndola pre-reposición foto 1'],label:'Pre-reposición'},
+      {url:r['Imágen de los 5 infaltables - foto 1'],label:'Infaltable'},
+      ...Array.from({length:4},(_,i)=>({url:r[`Foto competencia nueva ${i+1}`],label:`Competencia ${i+1}`})),
+      {url:r['Foto del exhibidor - 1'],label:'Exhibidor'},
+      ...Array.from({length:10},(_,i)=>({url:r[`Foto tiras impulsivas - ${i+1}`],label:`Tira ${i+1}`})),
     ].filter(i=>i.url&&i.url.startsWith('http'));
 
     if(imgs.length===0) return '';
@@ -1535,23 +1509,26 @@ function openDetail(formId){
 
   // Group photos by section
   const sections=[
-    {title:'Góndola',fotos:[
-      {url:r['Foto de la góndola completa'],label:'Góndola completa'},
-      {url:r['Foto detalle de OrganicSpa'],label:'Detalle Organic Spa'},
+    {title:'Góndola completa',fotos:[
+      ...Array.from({length:10},(_,i)=>({url:r[`Foto de la góndola completa ${i+1}`],label:`Góndola ${i+1}`})),
+    ]},
+    {title:'Detalle Organic Spa',fotos:[
+      ...Array.from({length:9},(_,i)=>({url:r[`Foto detalle de OrganicSpa ${i+1}`],label:`Detalle OS ${i+1}`})),
     ]},
     {title:'Pre-reposición',fotos:[
       {url:r['Góndola pre-reposición foto 1'],label:'Pre-reposición 1'},
-      {url:r['Góndola pre-reposición foto 2'],label:'Pre-reposición 2'},
-      {url:r['Góndola pre-reposición foto 3'],label:'Pre-reposición 3'},
-      {url:r['Góndola pre-reposición foto 4'],label:'Pre-reposición 4'},
-      {url:r['Góndola pre-reposición foto 5'],label:'Pre-reposición 5'},
     ]},
-    {title:'Los 5 infaltables',fotos:[
+    {title:'Infaltables',fotos:[
       {url:r['Imágen de los 5 infaltables - foto 1'],label:'Infaltable 1'},
-      {url:r['Imágen de los 5 infaltables - foto 2'],label:'Infaltable 2'},
-      {url:r['Imágen de los 5 infaltables - foto 3'],label:'Infaltable 3'},
-      {url:r['Imágen de los 5 infaltables - foto 4'],label:'Infaltable 4'},
-      {url:r['Imágen de los 5 infaltables - foto 5'],label:'Infaltable 5'},
+    ]},
+    {title:'Competencia detectada',fotos:[
+      ...Array.from({length:4},(_,i)=>({url:r[`Foto competencia nueva ${i+1}`],label:`Competencia ${i+1}`})),
+    ]},
+    {title:'Exhibidor',fotos:[
+      {url:r['Foto del exhibidor - 1'],label:'Exhibidor'},
+    ]},
+    {title:'Tiras impulsivas',fotos:[
+      ...Array.from({length:10},(_,i)=>({url:r[`Foto tiras impulsivas - ${i+1}`],label:`Tira ${i+1}`})),
     ]},
   ];
 
@@ -1570,6 +1547,7 @@ function openDetail(formId){
     {k:'¿Ingresó marca nueva?',v:r['¿Ingresó alguna marca nueva además de Spirit, Aromanza y Sagrada Madre?']},
     {k:'Tiras impulsivas',v:r['¿Cuantas tiras impulsivas hay en la tienda?']},
     {k:'¿Armado decoración especial?',v:r['¿Se vio armado de decoración especial?']},
+    {k:'Comentario repositor',v:r['Comentario']},
   ].filter(d=>d.v&&d.v!=='');
 
   const valColor=v=>{const s=(v||'').toLowerCase().trim();if(s==='sí'||s==='si')return 'color:var(--green)';if(s==='no')return 'color:var(--red)';return '';};
@@ -1646,7 +1624,7 @@ function renderCompetencia(){
     const sucName=parts[1]||'';
     const fecha=r['Fecha respuesta']||'';
     const repo=`${r['Nombre']||''} ${r['Apellido']||''}`.trim();
-    const fotoUrl=r['Foto de la góndola completa']||r['Foto detalle de OrganicSpa']||'';
+    const fotoUrl=r['Foto competencia nueva 1']||r['Foto de la góndola completa 1']||r['Foto detalle de OrganicSpa 1']||'';
     const mods=r['¿Cuántos módulos / punteras / exhibidor tenemos?']||'—';
     const espacio=r['¿Crecimos o perdimos espacio?']||'—';
     const espColor=espacio.toLowerCase().includes('perdi')?'color:var(--red)':espacio.toLowerCase().includes('creci')?'color:var(--green)':'color:var(--t2)';
